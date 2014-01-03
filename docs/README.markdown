@@ -15,18 +15,18 @@ The Dell IOM switch module is designed to extend the support for managing Dell I
 
 The Dell IOM switch module has been written and tested against the following Dell IOM switch models. However, this module may be compatible with other models and 
 their firmware versions.
--S4810(software version 9.2(0.2))) 
+-IOA/MXL(software version 9.2(0.2))) 
 However, this module may be compatible with other models & their software versions.
 
 
 ## Features
 This module supports the following functionality:
 
- * VLAN Creation and Deletion
- * Interface Configuration
- * Port Channel Creation and Deletion
- * Configuration Updates
- * Firmware Updates
+ * MXL VLAN Creation and Deletion
+ * MXL Interface Configuration
+ * MXL Port Channel Creation and Deletion
+ * IOA Interface Configuration
+
 
 ## Requirements
 Because the Puppet agent cannot be directly installed on a Dell IOM switch, the agent can be managed either using the Puppet Master server,
@@ -37,7 +37,7 @@ or through an intermediate proxy system running a Puppet agent. The following ar
 ## Usage
 
 ### Device Setup
-To configure a Dell IOM switch, the device *type* must be `dell_ftos`.
+To configure a Dell IOM switch, the device *type* must be `dell_iom`.
 The device can either be configured within */etc/puppet/device.conf*, or, preferably, create an individual config file for each device within a sub-folder.
 This is preferred because it allows the user to run the Puppet against individual devices, rather than all devices configured.
 
@@ -48,11 +48,11 @@ To run the Puppet against a single device, use the following command:
 Example configuration `/etc/puppet/device/iom.example.com.conf:
 
       [iom.example.com]
-      type dell_ftos
+      type dell_iom
       url ssh://admin:password@force10.example.com/?enable=password
 
-### Dell Force10 Operations
-This module can be used to configure VLANs, interfaces, and port channels on Dell IOM switch.
+### Dell IOM Operations
+This module can be used to configure VLANs, interfaces, and port channels on Dell MXL switch, also can be used for configuring interfaces on Dell IOA switch.
 For example: 
 
 node "iom.example.com" {
@@ -81,15 +81,24 @@ node "iom.example.com" {
 		tagged_tengigabitethernet => '0/16-17';    
 	}
 }
-This creates VLAN 180 and add TenGigabitEthernet 0/16 and 0/17 interfaces as tagged in the above definition.
-This module can be used to configure VLANs, interfaces, and port channels on Dell IOA switch.
-#TODO
+This creates VLAN 180 on MXL and add TenGigabitEthernet 0/16 and 0/17 interfaces as tagged in the above definition.
+
+node "iom.example.com" {
+  ioa_interface { 'TenGigabitEthernet 0/6':
+  vlan_tagged=>'180,181',
+  vlan_untagged=>'2-20',
+  shutdown    => true;
+  }
+}
+This will change change apply shutdown,tag VLAN 180,181 and and untag 0-20 VLANs for TenGigabitEthernet 0/6 on IOA switch.
+
 You can also use any of the above operations individually, or create new defined types, as required. The details of each operation and parameters 
 are mentioned in the following readme files that are shipped with the following modules:
 
   - mxl_interface.md
   - mxl_portchannel.md
   - mxl_vlan.md
+  - ioa_interface.md
 
 
 

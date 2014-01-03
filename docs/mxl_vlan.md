@@ -47,10 +47,24 @@ The Dell MXL switch module uses telnet/SSH to access Dell MXL switches.
 	name: (Required)This parameter defines the VLAN ID of the VLAN.
 	      The value must be between 1 and 4094.
 	
-	desc: This parameter defines the name of the VLAN
+	desc: This parameter defines the description of the VLAN
 	      The value must be a string and cannot exceed 100 characters.
 	
-	tagged_tengigabitethernet: This parameter defines the TegGigabitEthernet interface that needs to be tagged. You can enter a single interface or range of interfaces separated by commas or Ex:0/16-0/17 or 0/18
+	vlan_name:This parameter defines the name of the VLAN
+	      The value must be a string and cannot exceed 100 characters.
+		  
+	mtu: This parameter defines the mtu of the VLAN.
+		If the value exist, it sets that value to the mtu properties of the VLAN.
+		If the value does not exist, property remains unchanged (default or old values).
+		The mtu value must be between  594 and 12000.
+		
+	shutdown: This parameter defines whether or not to shut down the VLAN. 
+				The possible values are "true" or "false". The default value is "false".
+				If the value is 'true", it shuts down the VLAN.
+					
+	tagged_tengigabitethernet: This parameter defines the TenGigabitEthernet interface that needs to be tagged. You can enter a single interface or range of interfaces separated by commas or Ex:0/16-0/17 or 0/18
+	
+	tagged_fortygigabitethernet: This parameter defines the FortyGigabitEthernet interface that needs to be tagged. You can enter a single interface or range of interfaces separated by commas or Ex:0/16-0/17 or 0/18
 	
 	tagged_gigabitethernet:This parameter defines the GigabitEthernet interface that needs to be tagged. You can enter a single interface or range of interfaces separated by commas or Ex:0/16-0/17 or 0/18
 	
@@ -60,13 +74,15 @@ The Dell MXL switch module uses telnet/SSH to access Dell MXL switches.
 	
 	untagged_tengigabitethernet: This parameter defines the TegGigabitEthernet interface that needs to be untagged. You can enter a single interface or range of interfaces separated by commas or Ex:0/16-0/17 or 0/18
 	
+	untagged_fortygigabitethernet: This parameter defines the FortyGigabitEthernet interface that needs to be untagged. You can enter a single interface or range of interfaces separated by commas or Ex:0/16-0/17 or 0/18
+	
 	untagged_gigabitethernet: This parameter defines GigabitEthernet interface that needs to be untagged. You can enter a single interface or range of interfaces separated by commas or Ex:0/16-0/17 or 0/18
 	
 	untagged_portchannel: This parameter defines the port channel that needs to be untagged. You can enter a single interface or range of interfaces separated by commas or Ex:0/16-0/17 or 0/18
 	
 	untagged_sonet: This parameter defines the SONET interface that needs to be untagged. You can enter a single interface or range of interfaces separated by commas or Ex:0/16-0/17 or 0/18
 		
-    
+        
 # -------------------------------------------------------------------------
 # Parameter Signature 
 # -------------------------------------------------------------------------
@@ -74,10 +90,10 @@ The Dell MXL switch module uses telnet/SSH to access Dell MXL switches.
 #Provide transport and Map properties
 
     #Add VLAN 180
-	mxl_vlan {
-		  true:    	
-			desc     => 'test',
-			ensure => present;
+	mxl_vlan {'180':    	
+		desc     => 'test',
+		vlan_name=>'test name'
+		ensure => present;
 		}
 		
     # This will add TenGigabitEthernet 0/16 and 0/17 interfaces to VLAN 180 as tagged
