@@ -1,4 +1,4 @@
-require 'puppet/util/network_device/singelton_ftos'
+require 'puppet/util/network_device/singelton_iom'
 require 'puppet/provider/network_device'
 
 # This is the base Class of all prefetched Dell IOA device providers
