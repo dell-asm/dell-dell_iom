@@ -1,6 +1,6 @@
-require 'puppet/provider/dell_ftos'
+require 'puppet/provider/dell_iom'
 
-Puppet::Type.type(:mxl_portchannel).provide :dell_ftos, :parent => Puppet::Provider::Dell_ftos do
+Puppet::Type.type(:mxl_portchannel).provide :dell_iom, :parent => Puppet::Provider::Dell_iom do
 
   desc "Dell force10 switch provider for port channel configuration."
 

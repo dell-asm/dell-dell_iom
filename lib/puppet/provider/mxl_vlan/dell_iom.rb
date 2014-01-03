@@ -1,10 +1,10 @@
-#Provide for IOA 'VLAN' Type
+#Provide for MXL 'VLAN' Type
 
-require 'puppet/provider/dell_ftos'
+require 'puppet/provider/dell_iom'
 
-Puppet::Type.type(:ioa_vlan).provide :dell_ftos, :parent => Puppet::Provider::Dell_ftos do
+Puppet::Type.type(:mxl_vlan).provide :dell_iom, :parent => Puppet::Provider::Dell_iom do
 
-  desc "Dell IOA switch provider for VLAN configuration."
+  desc "Dell MXL switch provider for VLAN configuration."
 
   mk_resource_methods
   def initialize(device, *args)
