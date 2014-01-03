@@ -1,4 +1,4 @@
-name    'dell-force10'
+name    'dell-iom'
 version '0.1.0'
 source ''
 author ''
@@ -9,3 +9,4 @@ project_page ''
 
 ## Add dependencies, if any:
 # dependency 'username/name', '>= 1.2.0'
+# dependency 'force10', '>= 0.1.0'

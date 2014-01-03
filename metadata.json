@@ -1,5 +1,5 @@
 {
-  "name": "dell-force10",
+  "name": "dell-iom",
   "version": "0.1.0",
   "summary": "",
   "author": "",
@@ -25,7 +25,7 @@
       ],
       "providers": [
         {
-          "name": "dell_ftos"
+          "name": "dell_iom"
         }
       ],
       "name": "dell_exec",
@@ -44,8 +44,8 @@
       ],
       "providers": [
         {
-          "name": "dell_ftos",
-          "doc": "Dell Force10 Switch Provider for VLAN Configuration."
+          "name": "dell_iom",
+          "doc": "Dell IOM/MXL Switch Provider for VLAN Configuration."
         }
       ],
       "name": "dell_vlan",
