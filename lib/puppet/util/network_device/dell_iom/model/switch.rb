@@ -53,11 +53,11 @@ class Puppet::Util::NetworkDevice::Dell_iom::Model::Switch < Puppet::Util::Netwo
     :portchannel,
   ].each do |key|
     define_method key.to_s do |name|
-      grp = params[key].value.find { |resourcegrp| resourcegrp.name == name }
-      if grp.nil?
+      # grp = params[key].value.find { |resourcegrp| resourcegrp.name == name }
+      #if grp.nil?
         grp = Puppet::Util::NetworkDevice::Dell_ftos::Model.const_get(key.to_s.capitalize).new(transport, facts, {:name => name})
-        params[key].value << grp
-      end
+        #params[key].value << grp
+      #end
       grp.evaluate_new_params
       return grp
     end
@@ -67,11 +67,11 @@ class Puppet::Util::NetworkDevice::Dell_iom::Model::Switch < Puppet::Util::Netwo
     :ioa_interface,
   ].each do |key|
     define_method key.to_s do |name|
-      grp = params[key].value.find { |resourcegrp| resourcegrp.name == name }
-      if grp.nil?
+      #grp = params[key].value.find { |resourcegrp| resourcegrp.name == name }
+      #if grp.nil?
         grp = Puppet::Util::NetworkDevice::Dell_iom::Model.const_get(key.to_s.capitalize).new(transport, facts, {:name => name})
-        params[key].value << grp
-      end
+        #params[key].value << grp
+      #end
       grp.evaluate_new_params
       return grp
     end
