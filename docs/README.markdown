@@ -11,11 +11,11 @@
 		- [Dell IOM operations](#Dell-IOM-operations)
 
 ## Overview
-The Dell IOM switch module is designed to extend the support for managing Dell IOM switch configuration using Puppet and its Network Device functionality.
+The Dell IOM switch module is designed to extend the support for managing Dell PowerEdge M I/O Aggregator or Dell Force10 MXL 10/40GbE Switch IO Module configuration using Puppet and its Network Device functionality.
 
-The Dell IOM switch module has been written and tested against the following Dell IOM switch models. However, this module may be compatible with other models and 
-their firmware versions.
--IOA/MXL(software version 9.2(0.2))) 
+The Dell IOM switch module has been written and tested against the following Dell IOM switch models. However, this module may be compatible with other models and their firmware versions.
+-Dell PowerEdge M I/O Aggregator(software version 9.2(0.2))
+-Dell Force10 MXL 10/40GbE Switch IO Module(software version 9.2(0.2))
 However, this module may be compatible with other models & their software versions.
 
 
@@ -29,7 +29,7 @@ This module supports the following functionality:
 
 
 ## Requirements
-Because the Puppet agent cannot be directly installed on a Dell IOM switch, the agent can be managed either using the Puppet Master server,
+Because the Puppet agent cannot be directly installed on a Dell PowerEdge M I/O Aggregator or Dell Force10 MXL 10/40GbE Switch IO Module, the agent can be managed either using the Puppet Master server,
 or through an intermediate proxy system running a Puppet agent. The following are the requirements for the proxy system:
 
  * Puppet 2.7.+
@@ -49,10 +49,10 @@ Example configuration `/etc/puppet/device/iom.example.com.conf:
 
       [iom.example.com]
       type dell_iom
-      url ssh://admin:password@force10.example.com/?enable=password
+      url ssh://admin:password@iom.example.com/?enable=password
 
 ### Dell IOM Operations
-This module can be used to configure VLANs, interfaces, and port channels on Dell MXL switch, also can be used for configuring interfaces on Dell IOA switch.
+This module can be used to configure VLANs, interfaces, and port channels on Dell Force10 MXL 10/40GbE Switch IO Module, also can be used for configuring interfaces on Dell PowerEdge M I/O Aggregator.
 For example: 
 
 node "iom.example.com" {
