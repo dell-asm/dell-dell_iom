@@ -47,7 +47,7 @@ The Dell IOA switch module uses telnet/SSH to access Dell IOA switches.
     ioa_interface {
 						'te 0/6':
 						vlan_tagged => '100-110',
-						vlan_untagged => '88,60',
+						vlan_untagged => '88',
 						shutdown=>true;
 					} 
 
