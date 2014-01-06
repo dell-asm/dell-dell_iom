@@ -4,7 +4,7 @@ require 'puppet/util/network_device/dell_iom/model/ioa_interface'
 module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
   def self.ifprop(base, param, base_command = param, &block)
     base.register_scoped param, /^(interface\s+(\S+).*?)^!/m do
-      cmd 'sh run'
+      cmd 'sh interface status'
       match /^\s*#{base_command}\s+(.*?)\s*$/
       add do |transport, value|
         Puppet.debug(" command #{base_command} value  #{value}" )
