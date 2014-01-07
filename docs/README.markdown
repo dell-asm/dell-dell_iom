@@ -90,7 +90,7 @@ node "iom.example.com" {
   shutdown    => true;
   }
 }
-This change will  apply shutdown,tag VLAN 180,181 and untag 0-20 VLANs for TenGigabitEthernet 0/6 on IOA switch.
+This change will  apply shutdown,tag VLAN 180,181 and untag 0-20 VLANs for TenGigabitEthernet 0/6 on IOA.
 
 You can also use any of the above operations individually, or create new defined types, as required. The details of each operation and parameters 
 are mentioned in the following readme files that are shipped with the following modules:
