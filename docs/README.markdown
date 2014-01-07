@@ -14,8 +14,8 @@
 The Dell IOM switch module is designed to extend the support for managing Dell PowerEdge M I/O Aggregator or Dell Force10 MXL 10/40GbE Switch IO Module configuration using Puppet and its Network Device functionality.
 
 The Dell IOM switch module has been written and tested against the following Dell IOM switch models. However, this module may be compatible with other models and their firmware versions.
--Dell PowerEdge M I/O Aggregator(software version 9.2(0.2))
--Dell Force10 MXL 10/40GbE Switch IO Module(software version 9.2(0.2))
+- Dell PowerEdge M I/O Aggregator(software version 9.2(0.2))
+- Dell Force10 MXL 10/40GbE Switch IO Module(software version 9.2(0.2))
 However, this module may be compatible with other models & their software versions.
 
 
@@ -29,8 +29,8 @@ This module supports the following functionality:
 
 
 ## Requirements
-Because the Puppet agent cannot be directly installed on a Dell PowerEdge M I/O Aggregator or Dell Force10 MXL 10/40GbE Switch IO Module, the agent can be managed either using the Puppet Master server,
-or through an intermediate proxy system running a Puppet agent. The following are the requirements for the proxy system:
+The agent can be managed either using the Puppet Master server or through an intermediate proxy system running a Puppet agent because the Puppet agent cannot be directly installed on a Dell PowerEdge M I/O Aggregator or Dell Force10 MXL 10/40GbE Switch IO Module.
+The following are the requirements for the proxy system:
 
  * Puppet 2.7.+
 
@@ -41,7 +41,7 @@ To configure a Dell IOM switch, the device *type* must be `dell_iom`.
 The device can either be configured within */etc/puppet/device.conf*, or, preferably, create an individual config file for each device within a sub-folder.
 This is preferred because it allows the user to run the Puppet against individual devices, rather than all devices configured.
 
-To run the Puppet against a single device, use the following command:
+To run the Puppet against a single device, run the following command:
 
     puppet device --deviceconfig /etc/puppet/device/[device].conf
 
@@ -90,7 +90,7 @@ node "iom.example.com" {
   shutdown    => true;
   }
 }
-This will change change apply shutdown,tag VLAN 180,181 and and untag 0-20 VLANs for TenGigabitEthernet 0/6 on IOA switch.
+This change will  apply shutdown,tag VLAN 180,181 and untag 0-20 VLANs for TenGigabitEthernet 0/6 on IOA switch.
 
 You can also use any of the above operations individually, or create new defined types, as required. The details of each operation and parameters 
 are mentioned in the following readme files that are shipped with the following modules:
