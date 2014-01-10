@@ -2,28 +2,21 @@
 
 require 'spec_helper'
 
-
-
 describe Puppet::Type.type(:mxl_interface) do
-
-
-
 
   let :resource do
     described_class.new(
-        	:name => 'te 0/7',
-  		:shutdown    => true,
-                :portchannel => '110',
-                :mtu => '7899',
-                :switchport => 'true'
-	)
+    :name => 'te 0/7',
+    :shutdown    => true,
+    :portchannel => '110',
+    :mtu => '7899',
+    :switchport => 'true'
+    )
   end
 
   it "should have a 'name' parameter'" do
     described_class.new(:name => resource.name)[:name].should == 'te 0/7'
   end
-
-
 
   describe "when validating attributes" do
     [ :name ].each do |param|
@@ -38,9 +31,6 @@ describe Puppet::Type.type(:mxl_interface) do
       end
     end
   end
-
-
-
 
   describe "when validating attribute values" do
     before do
@@ -62,57 +52,49 @@ describe Puppet::Type.type(:mxl_interface) do
 
     describe "for portchannel negative" do
       it "should not allow a invalid portchannel" do
-        expect { described_class.new(:name => resource.name, :portchannel => '100')[:portchannel].should == '100' }.to raise_error
+        expect { described_class.new(:name => resource.name, :portchannel => '130')[:portchannel].should == '100' }.to raise_error
       end
     end
 
+    describe 'for shutdown' do
+      [ :true, :false ].each do |val|
+        it "should allow the value #{val.inspect}" do
+          described_class.new(:name => resource.name, :shutdown => val)
+        end
+      end
 
-    describe "for shutdown" do
-      it "should allow a valid shutdown value" do
-        described_class.new(:name => resource.name, :shutdown => 'true')[:shutdown].should == 'true'
+      it "should raise an exception on everything else" do
+        expect { described_class.new(:name => resource.name, :shutdown => :foobar) }.to raise_error
       end
     end
 
-    describe "for shutdown negative" do
-      it "should not allow a invalid shutdown" do
-        expect { described_class.new(:name => resource.name, :shutdown => 'yuyj')[:shutdown].should == 'yuyj' }.to raise_error
+    describe "for mtu " do
+      it "should allow a valid mtu" do
+        described_class.new(:name => resource.name, :mtu => '600')[:mtu].should == '600'
+      end
+    end
+    describe 'for mtu  invalid input ' do
+
+      it "should raise an exception on everything else" do
+        expect { described_class.new(:name => resource.name, :mtu => 'xyz') }.to raise_error
+        expect { described_class.new(:name => resource.name, :mtu => '500') }.to raise_error
+        expect { described_class.new(:name => resource.name, :mtu=> '13000') }.to raise_error
+
       end
     end
 
+    describe 'for switchport' do
+      [ :true, :false ].each do |val|
+        it "should allow the value #{val.inspect}" do
+          described_class.new(:name => resource.name, :switchport => val)
+        end
+      end
 
-    describe "for mtu" do
-      it "should allow a valid mtuportchannel" do
-        described_class.new(:name => resource.name, :mtu => '1000')[:mtu].should == '1000'
+      it "should raise an exception on everything else" do
+        expect { described_class.new(:name => resource.name, :switchport => :foobar) }.to raise_error
       end
     end
 
-    describe "for mtu negative" do
-      it "should not allow a invalid mtu" do
-        expect { described_class.new(:name => resource.name, :mtu => 'abcd')[:portchannel].should == 'abcd' }.to raise_error
-      end
-    end
+  end
 
-
-    describe "for switchport" do
-      it "should allow a valid switchport" do
-        described_class.new(:name => resource.name, :switchport => 'true')[:switchport].should == 'true'
-      end
-    end
-
-    describe "for switchport negative" do
-      it "should not allow a invalid switchport" do
-        expect { described_class.new(:name => resource.name, :switchport => '898')[:switchport].should == '898' }.to raise_error
-      end
-    end
-
-
-
-
- end
-
-
-  
 end
-
-
-
