@@ -47,7 +47,7 @@ Puppet::Type.newtype(:mxl_config) do
       :executed_command
     end
 
-    defaultto "#"
+    defaultto "-Configuration Change-"
 
     def change_to_s(currentvalue, newvalue)
       "executed successfully"
