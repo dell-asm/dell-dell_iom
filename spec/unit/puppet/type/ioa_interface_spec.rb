@@ -2,27 +2,20 @@
 
 require 'spec_helper'
 
-
-
 describe Puppet::Type.type(:ioa_interface) do
-
-
-
 
   let :resource do
     described_class.new(
-        	:name => 'te 0/7',
-  		:vlan_tagged => '100-110',
-  		:vlan_untagged => '88',
-  		:shutdown    => true
-	)
+    :name => 'te 0/7',
+    :vlan_tagged => '100-110',
+    :vlan_untagged => '88',
+    :shutdown    => true
+    )
   end
 
   it "should have a 'name' parameter'" do
     described_class.new(:name => resource.name)[:name].should == 'te 0/7'
   end
-
-
 
   describe "when validating attributes" do
     [ :name ].each do |param|
@@ -37,9 +30,6 @@ describe Puppet::Type.type(:ioa_interface) do
       end
     end
   end
-
-
-
 
   describe "when validating attribute values" do
     before do
@@ -62,10 +52,6 @@ describe Puppet::Type.type(:ioa_interface) do
       end
     end
 
-
-
-
-
     describe 'for vlan tagged ngtve' do
 
       it "should raise an exception on everything else" do
@@ -84,10 +70,6 @@ describe Puppet::Type.type(:ioa_interface) do
       end
     end
 
-
-
-
-
     describe 'for vlan untagged ngtve' do
 
       it "should raise an exception on everything else" do
@@ -101,15 +83,7 @@ describe Puppet::Type.type(:ioa_interface) do
       end
     end
 
+  end
 
-
-
-
- end
-
-
-  
 end
-
-
 

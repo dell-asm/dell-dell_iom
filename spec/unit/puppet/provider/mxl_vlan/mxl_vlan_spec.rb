@@ -1,19 +1,16 @@
 #! /usr/bin/env ruby
 require 'spec_helper'
-
 require 'puppet/provider/mxl_vlan/dell_iom'
 
 provider_class = Puppet::Type.type(:mxl_vlan).provider(:dell_iom)
 
 describe provider_class do
 
-
   before do
     @vlan = stub_everything 'vlan'
     @vlan.stubs(:name).returns('172')
     @vlan.stubs(:params_to_hash)
     @vlans = [ @vlan ]
-
 
     @switch = stub_everything 'switch'
     @switch.stubs(:vlan).returns(@vlans)
@@ -26,9 +23,7 @@ describe provider_class do
 
     @provider = provider_class.new(@device, @resource)
 
-
-  end  
-
+  end
 
   it "should have a parent of Puppet::Provider::Dell_iom" do
     provider_class.should < Puppet::Provider::Dell_iom
@@ -48,9 +43,8 @@ describe provider_class do
       @switch.expects(:vlan).with('172').returns(@vlan)
       @vlan.expects(:params_to_hash)
       provider_class.lookup(@device, '172')
-    end   
+    end
 
- 
     it "should return the given configuration data" do
       @device.expects(:switch).returns(@switch)
       @switch.expects(:vlan).with('172').returns(@vlan)
@@ -68,14 +62,13 @@ describe provider_class do
       @switch.expects(:vlan).with('172').returns(@vlan)
       @switch.stubs(:facts).returns({})
       @vlan.expects(:update).with({:ensure => :present, :name => '172', :mtu => '1110'},
-                                  {:ensure => :present, :name => '172', :mtu => '1110'})
+      {:ensure => :present, :name => '172', :mtu => '1110'})
       @vlan.expects(:update).never
 
       #@instance.desc = "FOOBAR"
       @instance.flush
     end
   end
-
 
 end
 

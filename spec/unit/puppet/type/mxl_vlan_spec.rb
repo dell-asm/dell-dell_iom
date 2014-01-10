@@ -2,27 +2,20 @@
 
 require 'spec_helper'
 
-
-
 describe Puppet::Type.type(:mxl_vlan) do
-
-
-
 
   let :resource do
     described_class.new(
-        	:name => '145',
-  		:shutdown    => true,
-                :vlan_name => 'SomeVlan',
-                :mtu => '1200' 
-	)
+    :name => '145',
+    :shutdown    => true,
+    :vlan_name => 'SomeVlan',
+    :mtu => '1200'
+    )
   end
 
   it "should have a 'name' parameter'" do
     described_class.new(:name => resource.name)[:name].should == '145'
   end
-
-
 
   describe "when validating attributes" do
     [ :name ].each do |param|
@@ -37,9 +30,6 @@ describe Puppet::Type.type(:mxl_vlan) do
       end
     end
   end
-
-
-
 
   describe "when validating attribute values" do
     before do
@@ -83,14 +73,7 @@ describe Puppet::Type.type(:mxl_vlan) do
       end
     end
 
+  end
 
-
-
- end
-
-
-  
 end
-
-
 

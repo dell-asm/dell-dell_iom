@@ -1,19 +1,16 @@
 #! /usr/bin/env ruby
 require 'spec_helper'
-
 require 'puppet/provider/ioa_interface/dell_iom'
 
 provider_class = Puppet::Type.type(:ioa_interface).provider(:dell_iom)
 
 describe provider_class do
 
-
   before do
     @ioa_interface = stub_everything 'ioa_interface'
     @ioa_interface.stubs(:name).returns('te 0/6')
     @ioa_interface.stubs(:params_to_hash)
     @ioa_interfaces = [ @ioa_interface ]
-
 
     @switch = stub_everything 'switch'
     @switch.stubs(:ioa_interface).returns(@ioa_interfaces)
@@ -26,9 +23,7 @@ describe provider_class do
 
     @provider = provider_class.new(@device, @resource)
 
-
-  end  
-
+  end
 
   it "should have a parent of Puppet::Provider::Dell_iom" do
     provider_class.should < Puppet::Provider::Dell_iom
@@ -48,9 +43,8 @@ describe provider_class do
       @switch.expects(:ioa_interface).with('te 0/6').returns(@ioa_interface)
       @ioa_interface.expects(:params_to_hash)
       provider_class.lookup(@device, 'te 0/6')
-    end   
+    end
 
- 
     it "should return the given configuration data" do
       @device.expects(:switch).returns(@switch)
       @switch.expects(:ioa_interface).with('te 0/6').returns(@ioa_interface)
@@ -68,14 +62,13 @@ describe provider_class do
       @switch.expects(:ioa_interface).with('te 0/6').returns(@ioa_interface)
       @switch.stubs(:facts).returns({})
       @ioa_interface.expects(:update).with({:ensure => :present, :name => 'te 0/6', :vlan_tagged => '100-110'},
-                                  {:ensure => :present, :name => 'te 0/6', :vlan_tagged => '100-110'})
+      {:ensure => :present, :name => 'te 0/6', :vlan_tagged => '100-110'})
       @ioa_interface.expects(:update).never
 
       #@instance.desc = "FOOBAR"
       @instance.flush
     end
   end
-
 
 end
 

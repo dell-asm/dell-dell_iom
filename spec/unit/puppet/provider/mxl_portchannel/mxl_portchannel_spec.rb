@@ -1,19 +1,16 @@
 #! /usr/bin/env ruby
 require 'spec_helper'
-
 require 'puppet/provider/mxl_portchannel/dell_iom'
 
 provider_class = Puppet::Type.type(:mxl_portchannel).provider(:dell_iom)
 
 describe provider_class do
 
-
   before do
     @portchannel = stub_everything 'portchannel'
     @portchannel.stubs(:name).returns('152')
     @portchannel.stubs(:params_to_hash)
     @portchannels = [ @portchannel ]
-
 
     @switch = stub_everything 'switch'
     @switch.stubs(:portchannel).returns(@portchannels)
@@ -26,9 +23,7 @@ describe provider_class do
 
     @provider = provider_class.new(@device, @resource)
 
-
-  end  
-
+  end
 
   it "should have a parent of Puppet::Provider::Dell_iom" do
     provider_class.should < Puppet::Provider::Dell_iom
@@ -48,9 +43,8 @@ describe provider_class do
       @switch.expects(:portchannel).with('152').returns(@portchannel)
       @portchannel.expects(:params_to_hash)
       provider_class.lookup(@device, '152')
-    end   
+    end
 
- 
     it "should return the given configuration data" do
       @device.expects(:switch).returns(@switch)
       @switch.expects(:portchannel).with('152').returns(@portchannel)
@@ -68,14 +62,13 @@ describe provider_class do
       @switch.expects(:portchannel).with('152').returns(@portchannel)
       @switch.stubs(:facts).returns({})
       @portchannel.expects(:update).with({:ensure => :present, :name => '152', :mtu => '1110'},
-                                  {:ensure => :present, :name => '152', :mtu => '1110'})
+      {:ensure => :present, :name => '152', :mtu => '1110'})
       @portchannel.expects(:update).never
 
       #@instance.desc = "FOOBAR"
       @instance.flush
     end
   end
-
 
 end
 
