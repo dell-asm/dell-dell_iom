@@ -1,6 +1,6 @@
 # Type for MXL VLAN
 # Parameters are
-#     name - any unique string
+#     name - VLAN ID
 # Properties are
 #   desc - description for VLAN
 #   mtu - mtu value for VLAN
@@ -15,13 +15,14 @@
 #   tagged_sonet - Sonet interface names need to be added to VLAN untagged
 
 Puppet::Type.newtype(:mxl_vlan) do
-  @doc = "This represents a VLAN configuration on a Dell MXL switch."
+  @doc = "This represents Dell MXL switch VLAN."
 
   apply_to_device
 
   ensurable
 
   newparam(:name) do
+    desc "VLAN ID, represents VLAN"
     isnamevar
     validate do |value|
       return if value == :absent
@@ -32,6 +33,7 @@ Puppet::Type.newtype(:mxl_vlan) do
   end
 
   newproperty(:vlan_name) do
+    desc "VLAN Name"
     validate do |vlan_name|
 
     end
@@ -47,6 +49,7 @@ Puppet::Type.newtype(:mxl_vlan) do
   end
 
   newproperty(:desc) do
+    desc "VLAN Description"
     validate do |value|
       return if value == :absent
       raise ArgumentError, "An invalid description is entered for the VLAN ID. The description cannot exceed 100 characters." unless value.length <= 100
@@ -55,13 +58,13 @@ Puppet::Type.newtype(:mxl_vlan) do
   end
 
   newproperty(:mtu) do
-    desc "Set mtu of the VLAN."
+    desc "MTU value"
     defaultto(:absent)
     newvalues(:absent, /^\d+$/)
   end
 
   newproperty(:shutdown) do
-    desc "Enable or disable  the VLAN."
+    desc "The shutdown flag of the VLAN, true means Shutdown else no shutdown"
     defaultto(:false)
     newvalues(:false,:true)
   end

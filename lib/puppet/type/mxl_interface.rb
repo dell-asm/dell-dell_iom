@@ -1,17 +1,26 @@
+# Type for MXL Interface
+# Parameters are
+#     name - Interface name
+# Properties are
+#   desc - description for Interface
+#   mtu - mtu value for Interface
+#   shutdown - The shutdown flag of the interface, true means Shutdown else no shutdown
+#   switchport - The switchport flag of the interface, true mean move the interface to Layer2, else interface will be in Layer1
+
 Puppet::Type.newtype(:mxl_interface) do
-  @doc = "This represents a MXL switch interface."
+  @doc = "This represents Dell MXL switch Interface."
 
   apply_to_device
 
   newparam(:name) do
-    desc "The interface's name."
+    desc "Interface name, which represents Interface."
     isrequired
     newvalues(/^\A+tengigabitethernet\s*\S+/i, /te\s*\S+$/i,/^fortygige\s*\S+$/i,/^fo\s*\S+$/i)
     isnamevar
   end
 
   newproperty(:portchannel) do
-    desc "Set port channel for the interface."
+    desc "Port-channel Name, which needs to be associated with this interface"
     newvalues(/^\d+$/)
     validate do |value|
       raise ArgumentError, "An invalid 'portchannel' value is entered. The 'portchannel' value must be between 1 and 128." unless value.to_i >=1 && value.to_i <= 128
@@ -19,7 +28,7 @@ Puppet::Type.newtype(:mxl_interface) do
   end
 
   newproperty(:mtu) do
-    desc "Set mtu of the interface."
+    desc "MTU value of interface."
     defaultto(:absent)
     newvalues(:absent, /^\d+$/)
     validate do |value|
@@ -29,13 +38,13 @@ Puppet::Type.newtype(:mxl_interface) do
   end
 
   newproperty(:shutdown) do
-    desc "Enable or disable  the interface."
+    desc "The shutdown flag of the interface, true means Shutdown else no shutdown"
     defaultto(:false)
     newvalues(:false,:true)
   end
 
   newproperty(:switchport) do
-    desc "Enable or disable  the switchport"
+    desc "The switchport flag of the interface, true mean move the interface to Layer2, else interface will be in Layer1"
     defaultto(:false)
     newvalues(:false,:true)
   end

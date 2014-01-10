@@ -1,3 +1,5 @@
+#Provide for MXL 'Port-channel' Type
+
 require 'puppet/provider/dell_iom'
 
 Puppet::Type.type(:mxl_portchannel).provide :dell_iom, :parent => Puppet::Provider::Dell_iom do

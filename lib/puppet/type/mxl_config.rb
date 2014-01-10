@@ -6,11 +6,12 @@
 #   force - boolean value, if true means forcefully apply the configuration though there is no configuration change
 
 Puppet::Type.newtype(:mxl_config) do
-  @doc = "Apply configuration on MXL switch."
+  @doc = "This will apply configuration on Dell MXL switch."
 
   apply_to_device
 
   newparam(:name) do
+    desc "Conifguration name, can be any unique name"
     isnamevar
     validate do |value|
       return if value == :absent
@@ -21,19 +22,20 @@ Puppet::Type.newtype(:mxl_config) do
   end
 
   newparam(:url) do
+    desc "Configuration TFTP URL"
     validate do |value|
       raise ArgumentError, "An invalid url is entered.Url must be a in format of tftp://${deviceRepoServerIPAddress}/${fileLocation}." unless value.start_with?('tftp://')
     end
   end
 
   newparam(:startup_config) do
-    desc "Whether the provided configuration is startup configuration or running configuration"
+    desc "This Flag denotes startup-config or running-config"
     newvalues(:true, :false)
     defaultto :false
   end
 
   newparam(:force) do
-    desc "Whether the provided configuration has to be applied in force"
+    desc "This Flag denotes force configuration apply"
     newvalues(:true, :false)
     defaultto :false
   end

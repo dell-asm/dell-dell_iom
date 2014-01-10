@@ -1,11 +1,20 @@
+# Type for MXL Port-channel
+# Parameters are
+#     name - Port-channel name
+# Properties are
+#   desc - description for Port-channel
+#   mtu - mtu value for Port-channel
+#   shutdown - The shutdown flag of the Port-channel, true means Shutdown else no shutdown
+
 Puppet::Type.newtype(:mxl_portchannel) do
-  @doc = "This represents a VLAN configuration on a Dell MXL switch."
+  @doc = "This represents Dell MXL switch Port-channel."
 
   apply_to_device
 
   ensurable
 
   newparam(:name) do
+    desc "Port-channel name, represents Port-channel"
     isnamevar
     newvalues(/^\d+$/)
 
@@ -17,10 +26,12 @@ Puppet::Type.newtype(:mxl_portchannel) do
   end
 
   newproperty(:desc) do
+    desc "Port-channel Description"
     newvalues(/^(\w\s*)*?$/)
   end
 
   newproperty(:mtu) do
+    desc "MTU value"
     newvalues(/^\d+$/)
 
     validate do |value|
@@ -29,7 +40,14 @@ Puppet::Type.newtype(:mxl_portchannel) do
     end
   end
 
+  newproperty(:switchport) do
+    desc "The switchport flag of the Port-channel, true mean move the port-channel to Layer2, else interface will be in Layer1"
+    defaultto(:false)
+    newvalues(:false,:true)
+  end
+
   newproperty(:shutdown) do
+    desc "The shutdown flag of the Port-channel, true means Shutdown else no shutdown"
     defaultto(:false)
     newvalues(:false,:true)
   end

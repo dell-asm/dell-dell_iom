@@ -1,3 +1,5 @@
+#Provide for IOA 'Interface' Type
+
 require 'puppet/provider/dell_iom'
 
 Puppet::Type.type(:ioa_interface).provide :dell_iom, :parent => Puppet::Provider::Dell_iom do
