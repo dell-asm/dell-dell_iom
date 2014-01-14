@@ -1,6 +1,6 @@
 # Tagging or 'no Tagging' Port-channel
 # Tagging always OVERRIDES the existing tagged Port-channels, means will apply 'no tagged' for all existed tagged Port-channel for
-# this vlan and add newly provided Port-channels ad tagged
+# this vlan and add newly provided Port-channels as tagged
 # Can remove all tagged Port-channel by passing value 'absent'
 
 # This will add Port-channel 1,20 to vlan 180 as tagged
