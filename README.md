@@ -92,13 +92,7 @@ node "iom.example.com" {
 }
 This change will  apply shutdown,tag VLAN 180,181 and untag 0-20 VLANs for TenGigabitEthernet 0/6 on IOA.
 
-You can also use any of the above operations individually, or create new defined types, as required. The details of each operation and parameters 
-are mentioned in the following readme files that are shipped with the following modules:
-
-  - mxl_interface.md
-  - mxl_portchannel.md
-  - mxl_vlan.md
-  - ioa_interface.md
+You can also use any of the above operations individually, or create new defined types, as required. See tests folder for additional examples.
 
 
 
