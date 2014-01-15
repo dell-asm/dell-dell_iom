@@ -92,7 +92,9 @@ node "iom.example.com" {
 }
 This change will  apply shutdown,tag VLAN 180,181 and untag 0-20 VLANs for TenGigabitEthernet 0/6 on IOA.
 
-You can also use any of the above operations individually, or create new defined types, as required. See tests folder for additional examples.
+You can also use any of the above operations individually, or create new defined types, as required.
+
+For additional examples, see tests folder.
 
 
 
