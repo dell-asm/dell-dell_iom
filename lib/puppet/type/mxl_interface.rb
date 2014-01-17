@@ -8,7 +8,7 @@
 #   switchport - The switchport flag of the interface, true mean move the interface to Layer2, else interface will be in Layer1
 
 Puppet::Type.newtype(:mxl_interface) do
-  @doc = "This represents Dell MXL switch Interface."
+  @doc = "This represents Dell MXL switch interface."
 
   apply_to_device
 

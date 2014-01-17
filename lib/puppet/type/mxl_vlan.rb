@@ -15,7 +15,7 @@
 #   tagged_sonet - Sonet interface names need to be added to VLAN untagged
 
 Puppet::Type.newtype(:mxl_vlan) do
-  @doc = "This represents Dell MXL switch VLAN."
+  @doc = "This represents Dell MXL switch vlan."
 
   apply_to_device
 

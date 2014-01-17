@@ -7,7 +7,7 @@
 #   shutdown - The shutdown flag of the Port-channel, true means Shutdown else no shutdown
 
 Puppet::Type.newtype(:mxl_portchannel) do
-  @doc = "This represents Dell MXL switch Port-channel."
+  @doc = "This represents Dell MXL switch port-channel."
 
   apply_to_device
 

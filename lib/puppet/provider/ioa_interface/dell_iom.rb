@@ -3,7 +3,7 @@
 require 'puppet/provider/dell_iom'
 
 Puppet::Type.type(:ioa_interface).provide :dell_iom, :parent => Puppet::Provider::Dell_iom do
-  desc "force 10 IOA Switch Interface Provider for Device Configuration."
+  desc "Dell IOA provider for interface configuration."
   mk_resource_methods
   def initialize(device, *args)
     super

@@ -7,6 +7,7 @@ require 'puppet/provider/dell_iom'
 require 'digest/md5'
 
 Puppet::Type.type(:mxl_config).provide :dell_iom, :parent => Puppet::Provider do
+  desc "Dell MXL switch provider for configuration updates."
   def run(url, startup_config, force)
     if startup_config == :true
       return applyconfig(url,'startup-config',force)

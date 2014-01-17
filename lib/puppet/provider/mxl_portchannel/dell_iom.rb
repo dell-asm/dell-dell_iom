@@ -4,7 +4,7 @@ require 'puppet/provider/dell_iom'
 
 Puppet::Type.type(:mxl_portchannel).provide :dell_iom, :parent => Puppet::Provider::Dell_iom do
 
-  desc "Dell force10 switch provider for port channel configuration."
+ desc "Dell MXL switch provider for port-channel configuration."
 
   mk_resource_methods
   def initialize(device, *args)

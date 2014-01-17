@@ -6,7 +6,7 @@
 #   vlan_untagged - UnTag the given vlan numbers to the interface
 
 Puppet::Type.newtype(:ioa_interface) do
-  @doc = "This represents Dell IOA switch interface."
+  @doc = "This represents Dell IOA interface."
 
   apply_to_device
 
