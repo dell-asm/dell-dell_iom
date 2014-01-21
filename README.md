@@ -8,7 +8,7 @@
 	- [Requirements](#requirements)
 	- [Usage](#usage)
 		- [Device Setup](#device-setup)
-		- [Dell IOM operations](#Dell-IOM-operations)
+		- [Dell IOM Operations](#dell-iom-operations)
 
 ## Overview
 The Dell IOM switch module is designed to extend the support for managing Dell PowerEdge M I/O Aggregator or Dell Force10 MXL 10/40GbE Switch IO Module configuration using Puppet and its Network Device functionality.
@@ -25,6 +25,7 @@ This module supports the following functionality:
  * MXL VLAN Creation and Deletion
  * MXL Interface Configuration
  * MXL Port Channel Creation and Deletion
+ * MXL Configuration Updates
  * IOA Interface Configuration
 
 
