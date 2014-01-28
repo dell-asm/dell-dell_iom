@@ -13,7 +13,7 @@ Puppet::Type.newtype(:ioa_interface) do
   newparam(:name) do
     desc "Interface name, represents interface."
     isrequired
-    newvalues(/^\A+tengigabitethernet\s*\S+/i, /te\s*\S+$/i,/^fortygige\s*\S+$/i,/^fo\s*\S+$/i)
+    newvalues(/^\Atengigabitethernet\s*\S+/i, /te\s*\S+$/i,/^fortygige\s*\S+$/i,/^fo\s*\S+$/i)
     isnamevar
   end
 
