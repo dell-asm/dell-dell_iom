@@ -43,8 +43,9 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
         param1
       end
       add do |transport, value|
-        transport.command("no vlan tagged 1-4094")
-        transport.command("vlan tagged #{value}")
+	    transport.command("no vlan tagged 1-4094")
+		transport.command("no vlan untagged #{value}")
+		transport.command("vlan tagged #{value}")
       end
       remove do |transport, old_value|
         transport.command("no vlan tagged #{old_value}")
@@ -64,6 +65,7 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
 
       add do |transport, value|
         transport.command("no vlan untagged 1-4094")
+		transport.command("no vlan tagged #{value}")
         transport.command("vlan untagged #{value}")
       end
       remove do |transport, old_value|
