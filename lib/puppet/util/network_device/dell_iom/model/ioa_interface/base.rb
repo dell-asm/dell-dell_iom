@@ -25,7 +25,7 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
     txt = ''
     ifprop(base, :ensure) do
       match do |txt|
-      	:present
+        :present
       end
       default :present
       add { |*_| }
@@ -36,16 +36,16 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
       match do |txt|
         paramsarray=txt.match(/^T\s+(\S+)/)
         if paramsarray.nil?
-           param1 = :absent
+          param1 = :absent
         else
-           param1 = paramsarray[1]
+          param1 = paramsarray[1]
         end
         param1
       end
       add do |transport, value|
-	    transport.command("no vlan tagged 1-4094")
-		transport.command("no vlan untagged #{value}")
-		transport.command("vlan tagged #{value}")
+        transport.command("no vlan tagged 1-4094")
+        transport.command("no vlan untagged #{value}")
+        transport.command("vlan tagged #{value}")
       end
       remove do |transport, old_value|
         transport.command("no vlan tagged #{old_value}")
@@ -56,34 +56,34 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
       match  do |txt|
         paramsarray=txt.match(/^U\s+(\S+)/)
         if paramsarray.nil?
-           param1 = :absent
+          param1 = :absent
         else
-           param1 = paramsarray[1]
+          param1 = paramsarray[1]
         end
         param1
       end
 
       add do |transport, value|
         transport.command("no vlan untagged 1-4094")
-		transport.command("no vlan tagged #{value}")
+        transport.command("no vlan tagged #{value}")
         transport.command("vlan untagged #{value}")
       end
       remove do |transport, old_value|
         transport.command("no vlan untagged #{old_value}")
       end
     end
-     
+
     general_scope = /^((#{interfaceval}).*)/m
 
     base.register_scoped :shutdown, general_scope do
       match do |txt|
-          paramsarray=txt.match(/^#{interfaceval} is up/)
-          if paramsarray.nil?
-            param1 = :true
-          else
-            param1 = :false
-          end
-          param1
+        paramsarray=txt.match(/^#{interfaceval} is up/)
+        if paramsarray.nil?
+          param1 = :true
+        else
+          param1 = :false
+        end
+        param1
       end
 
       cmd "show interfaces #{interfaceval}"
