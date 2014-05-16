@@ -59,8 +59,6 @@ Puppet::Type.newtype(:mxl_vlan) do
 
   newproperty(:mtu) do
     desc "MTU value"
-    defaultto(:absent)
-    newvalues(:absent, /^\d+$/)
   end
 
   newproperty(:shutdown) do
