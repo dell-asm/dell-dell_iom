@@ -51,6 +51,7 @@ class Puppet::Util::NetworkDevice::Dell_iom::Model::Switch < Puppet::Util::Netwo
     :vlan,
     :interface,
     :portchannel,
+    :feature
   ].each do |key|
     define_method key.to_s do |name|
       # grp = params[key].value.find { |resourcegrp| resourcegrp.name == name }
