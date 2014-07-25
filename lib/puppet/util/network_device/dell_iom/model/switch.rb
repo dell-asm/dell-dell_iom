@@ -1,12 +1,14 @@
 #This class represents the switch model which contains the switch resources.
 require 'puppet/util/network_device/dell_ftos/model'
 require 'puppet/util/network_device/dell_ftos/model/vlan'
+require 'puppet/util/network_device/dell_ftos/model/feature'
 require 'puppet/util/network_device/dell_ftos/model/base'
 require 'puppet/util/network_device/dell_ftos/model/generic_value'
 require 'puppet/util/network_device/dell_ftos/model/interface'
 require 'puppet/util/network_device/dell_ftos/model/portchannel'
 require 'puppet/util/network_device/dell_iom/model'
 require 'puppet/util/network_device/dell_iom/model/ioa_interface'
+
 
 class Puppet::Util::NetworkDevice::Dell_iom::Model::Switch < Puppet::Util::NetworkDevice::Dell_ftos::Model::Base
 
