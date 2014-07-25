@@ -106,4 +106,13 @@ Puppet::Type.newtype(:mxl_vlan) do
   newproperty(:untagged_sonet) do
     desc "The SONET interfaces names to add as untagged to this VLAN."
   end
+  
+  newproperty(:fc_map) do
+    desc "fc map that needs to be assigned to the fip-snooping session"
+  end
+  
+  newproperty(:fip_snooping) do
+    desc "fc map that needs to be assigned to the fip-snooping session"
+  end
+  
 end
