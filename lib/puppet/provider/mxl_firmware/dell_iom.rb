@@ -88,10 +88,6 @@ Puppet::Type.type(:mxl_firmware).provide :dell_iom, :parent => Puppet::Provider 
 
   def change_startup
     dev = Puppet::Util::NetworkDevice.current
-    flagfirstresponse=false
-    flagsecondresponse=false
-    flagthirdresponse=false
-
     dev.transport.command("copy running-config startup-config") do |out|
       if out.include? 'Proceed'
         break
