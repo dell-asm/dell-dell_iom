@@ -55,6 +55,15 @@ Example configuration `/etc/puppet/device/iom.example.com.conf`:
 ### Dell IOM Operations
 This module can be used to configure VLANs, interfaces, and port channels on Dell Force10 MXL 10/40GbE Switch IO Module, also can be used for configuring interfaces on Dell PowerEdge M I/O Aggregator.
 For example: 
+```puppet
+mxl_firmware { "update":
+ ensure       => present,
+ version      => '9.5.0.1',
+ path         => 'mxl_9_50/FTOS-XL-9.5.0.1.bin',
+ asm_hostname => '172.18.4.100',
+}
+```
+
 ```
 node "iom.example.com" {
   mxl_portchannel { '128':
