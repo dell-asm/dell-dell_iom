@@ -23,6 +23,7 @@ Puppet::Type.type(:mxl_firmware).provide :dell_iom, :parent => Puppet::Provider 
     dev = Puppet::Util::NetworkDevice.current
     output = dev.transport.command('show boot system stack-unit all')
     output.each_line do |ln|
+      ln.downcase!
       if ln.start_with? 'stack-unit' and !ln.include? 'not present'
         stack_units[ln.split(' ')[1]] = {'B' => ln.split(' ').last, 'A' => ln.split(' ')[-2]}
       end
@@ -68,10 +69,10 @@ Puppet::Type.type(:mxl_firmware).provide :dell_iom, :parent => Puppet::Provider 
       @nonboot = s[:properties][:boot] == 'A' ? 'b' : 'a'
       Puppet.debug("updating stack unit: #{s[:unit]}")
       update_cmd = "upgrade system tftp://#{@fw_host}/#{location} #{@nonboot}:"
-#      output = dev.transport.command(update_cmd)
-#      if !output.include? 'System image upgrade completed successfully'
-#        Puppet.err "Failed to updrade stack unit #{s[:unit]}"
-#      end
+      output = dev.transport.command(update_cmd)
+      if !output.include? 'System image upgrade completed successfully'
+        raise Puppet::Error, "Failed to updrade stack unit #{s[:unit]}"
+      end
     end
     change_boot_stack(dev,@nonboot)
     change_startup
