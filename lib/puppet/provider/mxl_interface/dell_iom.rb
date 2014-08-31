@@ -13,6 +13,7 @@ Puppet::Type.type(:mxl_interface).provide :dell_iom, :parent => Puppet::Provider
     if !name.nil?
       name=name.gsub(/te |tengigabitethernet /i, "TenGigabitEthernet ")
       name=name.gsub(/fo |fortygige /i, "fortyGigE ")
+      name=name.gsub(/fc\s*/i, "fibreChannel ")
     end
     device.switch.interface(name).params_to_hash
   end

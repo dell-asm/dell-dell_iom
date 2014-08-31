@@ -13,6 +13,7 @@ Puppet::Type.type(:ioa_interface).provide :dell_iom, :parent => Puppet::Provider
     if !name.nil?
       name=name.gsub(/te |tengigabitethernet /i, "TenGigabitEthernet ")
       name=name.gsub(/fo |fortygige /i, "fortyGigE ")
+      name=name.gsub(/fc /i, "fibreChannel ")
     end
     paramstohash = device.switch.ioa_interface(name).params_to_hash
     device.switch.ioa_interface(name).params_to_hash

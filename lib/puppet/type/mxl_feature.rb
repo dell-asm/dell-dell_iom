@@ -13,7 +13,7 @@ Puppet::Type.newtype(:mxl_feature) do
     desc "feature that needs to be enabled / disabled on the switch"
     isnamevar
     isrequired
-    newvalues('fip-snooping')
+    newvalues('fip-snooping','fc')
   end
 
   
