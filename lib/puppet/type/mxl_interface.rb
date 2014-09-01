@@ -15,7 +15,7 @@ Puppet::Type.newtype(:mxl_interface) do
   newparam(:name) do
     desc "Interface name, which represents Interface."
     isrequired
-    newvalues(/^\Atengigabitethernet\s*\S+/i, /te\s*\S+$/i,/^fortygige\s*\S+$/i,/^fo\s*\S+$/i)
+    newvalues(/^\Atengigabitethernet\s*\S+/i, /te\s*\S+$/i,/^fortygige\s*\S+$/i,/^fo\s*\S+$/i,/^fc\s*\S+$/i,/^fibreChannel\s*\S+$/i)
     isnamevar
   end
 
@@ -29,7 +29,7 @@ Puppet::Type.newtype(:mxl_interface) do
 
   newproperty(:mtu) do
     desc "MTU value of interface."
-    defaultto(:absent)
+    #defaultto(:absent)
     newvalues(:absent, /^\d+$/)
     validate do |value|
       return if value == :absent
@@ -39,14 +39,38 @@ Puppet::Type.newtype(:mxl_interface) do
 
   newproperty(:shutdown) do
     desc "The shutdown flag of the interface, true means Shutdown else no shutdown"
-    defaultto(:false)
+    #defaultto(:false)
     newvalues(:false,:true)
   end
 
   newproperty(:switchport) do
     desc "The switchport flag of the interface, true mean move the interface to Layer2, else interface will be in Layer1"
-    defaultto(:false)
+    #defaultto(:false)
     newvalues(:false,:true)
+  end
+  
+  newproperty(:fcoe_map) do
+    desc "fcoe map that needs to be associated with the interface"
+    validate do |value|
+      all_valid_characters = value =~ /^[A-Za-z0-9_]+$/
+      raise ArgumentError, "Invalid fcoe-map name" unless all_valid_characters
+    end
+  end
+  
+  newproperty(:dcb_map) do
+    desc "dcb map that needs to be associated with the interface"
+    validate do |value|
+      all_valid_characters = value =~ /^[A-Za-z0-9_]+$/
+      raise ArgumentError, "Invalid dcb-map name" unless all_valid_characters
+    end
+  end
+  
+  newproperty(:fabric) do
+    desc "fcoe-map that needs to be associated with Fiber-Channel Interface"
+    validate do |value|
+      all_valid_characters = value =~ /^[A-Za-z0-9_]+$/
+      raise ArgumentError, "Invalid fcoe-map name" unless all_valid_characters
+    end
   end
 
 end

@@ -2,6 +2,9 @@
 require 'puppet/util/network_device/dell_ftos/model'
 require 'puppet/util/network_device/dell_ftos/model/vlan'
 require 'puppet/util/network_device/dell_ftos/model/feature'
+require 'puppet/util/network_device/dell_ftos/model/fcoemap'
+require 'puppet/util/network_device/dell_ftos/model/dcbmap'
+require 'puppet/util/network_device/dell_ftos/model/uplinkstategroup'
 require 'puppet/util/network_device/dell_ftos/model/base'
 require 'puppet/util/network_device/dell_ftos/model/generic_value'
 require 'puppet/util/network_device/dell_ftos/model/interface'
@@ -53,7 +56,10 @@ class Puppet::Util::NetworkDevice::Dell_iom::Model::Switch < Puppet::Util::Netwo
     :vlan,
     :interface,
     :portchannel,
-    :feature
+    :feature,
+    :fcoemap,
+    :dcbmap,
+    :uplinkstategroup
   ].each do |key|
     define_method key.to_s do |name|
       # grp = params[key].value.find { |resourcegrp| resourcegrp.name == name }
