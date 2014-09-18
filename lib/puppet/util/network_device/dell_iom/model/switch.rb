@@ -9,6 +9,7 @@ require 'puppet/util/network_device/dell_ftos/model/base'
 require 'puppet/util/network_device/dell_ftos/model/generic_value'
 require 'puppet/util/network_device/dell_ftos/model/interface'
 require 'puppet/util/network_device/dell_ftos/model/portchannel'
+require 'puppet/util/network_device/dell_ftos/model/quadmode'
 require 'puppet/util/network_device/dell_iom/model'
 require 'puppet/util/network_device/dell_iom/model/ioa_interface'
 
@@ -59,7 +60,8 @@ class Puppet::Util::NetworkDevice::Dell_iom::Model::Switch < Puppet::Util::Netwo
     :feature,
     :fcoemap,
     :dcbmap,
-    :uplinkstategroup
+    :uplinkstategroup,
+    :quadmode
   ].each do |key|
     define_method key.to_s do |name|
       # grp = params[key].value.find { |resourcegrp| resourcegrp.name == name }
