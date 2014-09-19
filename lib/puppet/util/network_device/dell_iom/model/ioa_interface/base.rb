@@ -45,7 +45,7 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
       add do |transport, value|
         # Find the VLANS which are already configured
         existing_config = transport.command("show config")
-        tagged_vlan = existing_config.scan(/vlan tagged\s+(.*?)$/m).flatten.first
+        tagged_vlan = ( existing_config.scan(/vlan tagged\s+(.*?)$/m).flatten.first || '' )
         vlans = tagged_vlan.split(",")
         temp_vlans = []
         vlans.each_with_index do |vlan,index|
@@ -99,7 +99,7 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
       end
 
       add do |transport, value|
-        transport.command("no vlan untagged 1-4094")
+        transport.command("no vlan untagged")
         transport.command("no vlan tagged #{value}")
         transport.command("vlan untagged #{value}")
       end
@@ -134,3 +134,4 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
 
   end
 end
+
