@@ -43,10 +43,49 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
         param1
       end
       add do |transport, value|
-        transport.command("no vlan tagged 1-4094")
+        # Find the VLANS which are already configured
+        existing_config = transport.command("show config")
+        tagged_vlan = ( existing_config.scan(/vlan tagged\s+(.*?)$/m).flatten.first || '' )
+        vlans = tagged_vlan.split(",")
+        temp_vlans = []
+        vlans.each_with_index do |vlan,index|
+          if vlan.include?('-')
+            vlan_range = vlan.split("-").flatten
+            vlan_value = (vlan_range[0]..vlan_range[1]).to_a
+            temp_vlans.concat(vlan_value)
+          else
+            temp_vlans.push(vlan)
+          end
+        end
+        requested_vlans = value.split(",").uniq.sort
+        Puppet.debug "Requested_vlans: #{requested_vlans}"
+
+        # Find VLANs that need to be skipped
+        missing_vlans = []
+        vlans_toadd = []
+        (1..4094).each do |vlan_id|
+          missing_vlans.push(vlan_id) if !requested_vlans.include?(vlan_id.to_s)
+        end
+
+        missing_vlans = missing_vlans.to_ranges.join(",").gsub(/\.\./,'-')
+        Puppet.debug "Missing VLAN Range: #{missing_vlans}"
+
+        if temp_vlans == requested_vlans
+          Puppet.debug "No change"
+        else
+          if temp_vlans.empty?
+            vlans_toadd = value
+          else
+            requested_vlans.map { |x| vlans_toadd.push(x) if temp_vlans.include?(x) }
+            vlans_toadd = vlans_toadd.to_ranges.join(",").gsub(/\.\./,'-')
+          end
+        end
+
         transport.command("no vlan untagged")
-        transport.command("vlan tagged #{value}")
+        transport.command("no vlan tagged #{missing_vlans}") if !missing_vlans.nil?
+        transport.command("vlan tagged #{vlans_toadd}") if !vlans_toadd.nil?
       end
+
       remove do |transport, old_value|
         transport.command("no vlan tagged #{old_value}")
       end
@@ -64,7 +103,7 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
       end
 
       add do |transport, value|
-        transport.command("no vlan untagged 1-4094")
+        transport.command("no vlan untagged")
         transport.command("no vlan tagged #{value}")
         transport.command("vlan untagged #{value}")
       end

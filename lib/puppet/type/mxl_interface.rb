@@ -23,7 +23,8 @@ Puppet::Type.newtype(:mxl_interface) do
     desc "Port-channel Name, which needs to be associated with this interface"
     newvalues(/^\d+$/)
     validate do |value|
-      raise ArgumentError, "An invalid 'portchannel' value is entered. The 'portchannel' value must be between 1 and 128." unless value.to_i >=1 && value.to_i <= 128
+      # If port-channel is speificed as "zero" LACP setting is removed from the interface
+      raise ArgumentError, "An invalid 'portchannel' value is entered. The 'portchannel' value must be between 0 and 128." unless value.to_i >=0 && value.to_i <= 128
     end
   end
 
