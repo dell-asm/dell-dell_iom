@@ -73,8 +73,12 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
         if temp_vlans == requested_vlans
           Puppet.debug "No change"
         else
-          requested_vlans.map { |x| vlans_toadd.push(x) if temp_vlans.include?(x) }
-          vlans_toadd = vlans_toadd.to_ranges.join(",").gsub(/\.\./,'-')
+          if temp_vlans.empty?
+            vlans_toadd = value
+          else
+            requested_vlans.map { |x| vlans_toadd.push(x) if temp_vlans.include?(x) }
+            vlans_toadd = vlans_toadd.to_ranges.join(",").gsub(/\.\./,'-')
+          end
         end
 
         transport.command("no vlan untagged")
@@ -134,4 +138,3 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
 
   end
 end
-
