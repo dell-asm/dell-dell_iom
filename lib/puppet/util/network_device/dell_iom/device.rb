@@ -79,3 +79,11 @@ class Puppet::Util::NetworkDevice::Dell_iom::Device < Puppet::Util::NetworkDevic
     facts
   end
 end
+
+class Array
+  def to_ranges(seperator='..')
+    compact.sort.uniq.inject([]) do |r,x|
+      r.empty? || r.last.last.succ != x ? r << (x..x) : r[0..-2] << (r.last.first..x)
+    end
+  end
+end
