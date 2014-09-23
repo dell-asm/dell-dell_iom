@@ -59,5 +59,10 @@ Puppet::Type.newtype(:mxl_portchannel) do
       raise ArgumentError, "Invalid fcoe-map name" unless all_valid_characters
     end
   end
+  
+  newproperty(:fip_snooping_fcf) do
+    desc "enable / disable fip-snooping fcf setting"
+    newvalues(:false,:true)
+  end
 
 end

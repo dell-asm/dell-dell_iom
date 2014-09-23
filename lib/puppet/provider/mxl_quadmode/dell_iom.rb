@@ -10,16 +10,11 @@ Puppet::Type.type(:mxl_quadmode).provide :dell_iom, :parent => Puppet::Provider:
   end
 
   def self.lookup(device, name)
-    if !name.nil?
-      name=name.gsub(/te |tengigabitethernet /i, "TenGigabitEthernet ")
-      name=name.gsub(/fo |fortygige /i, "fortyGigE ")
-      name=name.gsub(/fc\s*/i, "fibreChannel ")
-    end
     device.switch.quadmode(name).params_to_hash
   end
 
   def flush
-    device.switch.quadmode(name).update(former_properties, properties)
+    device.switch.quadmode(name).update(former_properties, properties, self.resource[:reboot_required])
     super
   end
 end

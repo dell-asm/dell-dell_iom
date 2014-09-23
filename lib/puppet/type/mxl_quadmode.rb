@@ -13,8 +13,13 @@ Puppet::Type.newtype(:mxl_quadmode) do
   newparam(:name) do
     desc "Interface name, for which quad port needs to be enabled / disabled."
     isrequired
-    newvalues(/^\Atengigabitethernet\s*\S+/i, /te\s*\S+$/i,/^fortygige\s*\S+$/i,/^fo\s*\S+$/i)
     isnamevar
+  end
+  
+  newparam(:reboot_required) do
+    desc "Flag to inidicate if switch needs to be rebooted after change."
+    newvalues(:true,:false)
+    defaultto(:false)
   end
 
 end
