@@ -34,16 +34,12 @@ Puppet::Type.newtype(:mxl_vlan) do
 
   newproperty(:vlan_name) do
     desc "VLAN Name"
-    validate do |vlan_name|
-
-    end
 
     validate do |value|
       return if value == :absent
       start_with_letter = value =~ /\A[a-zA-Z]/
-      all_valid_characters = value =~ /^[a-zA-Z0-9_\s]+$/
-      raise ArgumentError, "An invalid name is entered for the VLAN ID. The name should start with alphabet and should contain only alphanumeric, space and underscore." unless (start_with_letter and all_valid_characters)
-      raise ArgumentError, "An invalid name is entered for the VLAN ID. The name cannot exceed 32 characters." unless value.length <= 32
+      raise ArgumentError, 'VLAN name should start with alphabet.' unless start_with_letter
+      raise ArgumentError, 'VLAN name cannot exceed 32 characters.' unless value.length <= 32
     end
     newvalues(/^(\w\s*)*?$/)
   end
