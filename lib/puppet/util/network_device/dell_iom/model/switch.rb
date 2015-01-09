@@ -12,6 +12,7 @@ require 'puppet/util/network_device/dell_ftos/model/portchannel'
 require 'puppet/util/network_device/dell_ftos/model/quadmode'
 require 'puppet/util/network_device/dell_iom/model'
 require 'puppet/util/network_device/dell_iom/model/ioa_interface'
+require 'puppet/util/network_device/dell_iom/model/ioa_mode'
 
 
 class Puppet::Util::NetworkDevice::Dell_iom::Model::Switch < Puppet::Util::NetworkDevice::Dell_ftos::Model::Base
@@ -76,6 +77,7 @@ class Puppet::Util::NetworkDevice::Dell_iom::Model::Switch < Puppet::Util::Netwo
 
   [
     :ioa_interface,
+    :ioa_mode
   ].each do |key|
     define_method key.to_s do |name|
       #grp = params[key].value.find { |resourcegrp| resourcegrp.name == name }
