@@ -51,29 +51,8 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_mode::Base
       default :absent
 
       if base.facts['iom_mode'] != desired_iom_mode
-        # Default configuration
-        Puppet.debug('Default configuration needs to be configured')
-        transport.command('end')
-        transport.command('enable')
-        transport.command('restore factory-defaults stack-unit 0 clear-all', :prompt => /Confirm .*/)
-        transport.command('yes',:prompt => /Power-cycling/)
-        Puppet.debug('Switch will be rebooting, need to reconnect to the switch')
-        transport.close
-
-        # Need to wait for the switch to come back and refresh the connectivity
-        # Sleeping for a minute
-        (1..5).each do |retry_count|
-          sleep(60)
-          begin
-            transport.connect
-            break
-          rescue Exception => e
-            Puppet.debug("Failed to connect, retry counter #{retry_count}")
-          end
-        end
-
-        # For VLT, change the switch to ethernet mode.
-        if desired_iom_mode == 'vlt'
+        # For VLT, change the switch to ethernet mode for FN 2210S IOA
+        if desired_iom_mode == 'vlt' and base.facts['product_name'].match(/2210S/)
           transport.command('enable')
           transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
           transport.command('stack-unit 0 port-group 0 portmode ethernet',:prompt => /confirm.*/ )
