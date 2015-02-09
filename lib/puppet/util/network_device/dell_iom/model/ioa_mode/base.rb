@@ -37,6 +37,51 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_mode::Base
       remove { |*_| }
     end
 
+    ifprop(base, :ioa_ethernet_mode) do
+      Puppet.debug("IOA Ethernet mode , base name: #{base.name}")
+      match do |txt|
+        :present
+      end
+      default :absent
+
+      add do |transport, value|
+        Puppet.debug("Updating the ethernet mode of the switch")
+        if value == :true
+          if base.facts['product_name'].match(/2210S/) and
+              (base.facts['ioa_ethernet_mode'].nil?)
+            Puppet.debug('Switch is not in ethernet mode')
+            transport.command('enable')
+            transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
+            transport.command('stack-unit 0 port-group 0 portmode ethernet',:prompt => /confirm.*/ )
+            transport.command('yes')
+            transport.command('end')
+
+            # Save the configuration and reload switch
+            transport.command('enable')
+            transport.command('write memory')
+            transport.command('reload', :prompt => /confirm.*/i)
+            transport.command('yes')
+            # Close connection and call connect method to restore the connection
+            transport.close
+            # Sleeping for a minute
+            (1..5).each do |retry_count|
+              sleep(60)
+              begin
+                transport.connect
+                break
+              rescue Exception => e
+                Puppet.debug("Failed to connect, retry counter #{retry_count}")
+              end
+            end
+            base.facts['ioa_ethernet_mode'] = 'stack-unit 0 port-group 0 portmode ethernet'
+          end
+        else
+          Puppet.debug("Flag for setting the ethernet mode is false")
+        end
+      end
+      remove { |*_| }
+    end
+
     ifprop(base, :iom_mode) do
       Puppet.debug("Base name: #{base.name}")
 
@@ -52,32 +97,6 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_mode::Base
 
       if base.facts['iom_mode'] != desired_iom_mode
         # For VLT, change the switch to ethernet mode for FN 2210S IOA
-        if desired_iom_mode == 'vlt' and base.facts['product_name'].match(/2210S/)
-          transport.command('enable')
-          transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
-          transport.command('stack-unit 0 port-group 0 portmode ethernet',:prompt => /confirm.*/ )
-          transport.command('yes')
-          transport.command('end')
-
-          # Save the configuration and reload switch
-          transport.command('enable')
-          transport.command('write memory')
-          transport.command('reload', :prompt => /confirm.*/i)
-          transport.command('yes')
-          # Close connection and call connect method to restore the connection
-          transport.close
-          # Sleeping for a minute
-          (1..5).each do |retry_count|
-            sleep(60)
-            begin
-              transport.connect
-              break
-            rescue Exception => e
-              Puppet.debug("Failed to connect, retry counter #{retry_count}")
-            end
-          end
-        end
-
         transport.command('enable')
         transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
         transport.command("stack-unit 0 iom-mode #{desired_iom_mode}")
@@ -108,5 +127,7 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_mode::Base
       add { |*_| }
       remove { |*_| }
     end
+
   end
+
 end
