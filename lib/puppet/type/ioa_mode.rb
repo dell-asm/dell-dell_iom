@@ -26,5 +26,10 @@ Puppet::Type.newtype(:ioa_mode) do
     newvalues('smux','pmux','vlt')
   end
 
+  newproperty(:ioa_ethernet_mode) do
+    desc 'flag to decide if ioa ethernet mode needs to be enabled'
+    newvalues(:true,:false)
+  end
+
 end
 
