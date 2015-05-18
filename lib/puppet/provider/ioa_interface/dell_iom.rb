@@ -16,7 +16,6 @@ Puppet::Type.type(:ioa_interface).provide :dell_iom, :parent => Puppet::Provider
       name=name.gsub(/fc /i, "fibreChannel ")
       name=name.gsub(/po /i, 'Port-channel ')
     end
-    paramstohash = device.switch.ioa_interface(name).params_to_hash
     device.switch.ioa_interface(name).params_to_hash
   end
 

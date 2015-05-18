@@ -32,6 +32,45 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
       remove { |*_| }
     end
 
+    ifprop(base, :switchport) do
+      match do |switchporttxt|
+        unless switchporttxt.nil?
+          switchporttxt.downcase.include? "vlan membership"
+        end
+      end
+      add do |transport, value|
+        unless value.nil?
+          cmd = value ? 'switchport' : 'no switchport'
+          transport.command(cmd) do |out|
+            if out =~/Error:\s*(.*)/
+              Puppet.debug "#{$1}"
+            end
+          end
+        end
+      end
+      remove { |*_| }
+    end
+
+    ifprop(base, :portmode) do
+      match do |txt|
+        txt =~ /Hybrid/i ? :hybrid : nil
+      end
+
+      add do |transport, value|
+        Puppet.debug('Need to remove existing configuration to set portmode')
+        existing_config=(transport.command('show config') || '').split("\n").reverse
+        updated_config = existing_config.find_all {|x| x.match(/dcb|switchport|spanning|vlan/)}
+        updated_config.each do |remove_command|
+          transport.command("no #{remove_command}")
+        end
+        transport.command('portmode hybrid')
+        updated_config.reverse.each do |remove_command|
+          transport.command("#{remove_command}")
+        end
+      end
+      remove { |*_| }
+    end
+
     ifprop(base, :vlan_tagged) do
       match do |txt|
         paramsarray=txt.match(/^T\s+(\S+)/)
