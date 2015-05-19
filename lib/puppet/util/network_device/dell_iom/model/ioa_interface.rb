@@ -33,7 +33,7 @@ class Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface < Puppet::Util
     register_new_module(:base)
   end
 
-  def before_update
+  def before_update(params_to_update=[])
 
     transport.command("show interfaces #{@name}")do |out|
       if out =~/Error:\s*(.*)/

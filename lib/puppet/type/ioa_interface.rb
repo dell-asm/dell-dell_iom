@@ -25,36 +25,48 @@ Puppet::Type.newtype(:ioa_interface) do
 
   newproperty(:vlan_tagged) do
     desc "Tag the given vlan numbers to the interface."
+    munge do |value|
+      #If the list is empty, we send back nil so Puppet doesn't try to do anything with the property
+      value.empty? ? nil : value
+    end
     validate do |value|
-      return if value == :absent
+      return if value == :absent || value.empty?
       all_valid_characters = value =~ /^[0-9]+$/
       paramsarray=value.match(/(\d*)\s*[,-]\s*(\d*)/)
-      if paramsarray.nil?
-        raise ArgumentError, "An invalid VLAN ID #{value} is entered.The VLAN ID must be between 1 and 4094. And it should be in a format like 67,89 or 50-100 or 89" unless all_valid_characters && value.to_i >= 1 && value.to_i <= 4094
-      else
-        param1 = paramsarray[1]
-        param2 = paramsarray[2]
-        all_valid_characters = param1 =~ /^[0-9]+$/
-        raise ArgumentError, "An invalid VLAN ID #{param1} is entered.The VLAN ID must be between 1 and 4094." unless all_valid_characters && param1.to_i >= 1 && param1.to_i <= 4094
-        all_valid_characters = param2=~ /^[0-9]+$/
-        raise ArgumentError, "An invalid VLAN ID #{param2} is entered.The VLAN ID must be between 1 and 4094." unless all_valid_characters && param2.to_i >= 1 && param2.to_i <= 4094
-
-      end
+      param1 = paramsarray[1]
+      param2 = paramsarray[2]
+      all_valid_characters = param1 =~ /^[0-9]+$/
+      raise ArgumentError, "An invalid VLAN ID #{param1} is entered.The VLAN ID must be between 1 and 4094." unless all_valid_characters && param1.to_i >= 1 && param1.to_i <= 4094
+      all_valid_characters = param2=~ /^[0-9]+$/
+      raise ArgumentError, "An invalid VLAN ID #{param2} is entered.The VLAN ID must be between 1 and 4094." unless all_valid_characters && param2.to_i >= 1 && param2.to_i <= 4094
       raise ArgumentError, "An invalid VLAN ID #{value} is entered. The VLAN ID must be between 1 and 4094." unless all_valid_characters && value.to_i >= 1 && value.to_i <= 4094
-
     end
 
   end
 
   newproperty(:vlan_untagged) do
     desc "UnTag the given vlan numbers to the interface."
+    munge do |value|
+      #If the list is empty, we send back nil so Puppet doesn't try to do anything with the property
+      value.empty? ? nil : value
+    end
     validate do |value|
-      return if value == :absent
+      return if value == :absent || value.empty?
       all_valid_characters = value =~ /^[0-9]+$/
       raise ArgumentError, "An invalid VLAN ID #{value} is entered. The VLAN ID must be between 1 and 4094." unless all_valid_characters && value.to_i >= 1 && value.to_i <= 4094
 
     end
 
+  end
+
+  newproperty(:switchport) do
+    desc "The switchport flag of the interface, true means move the interface to Layer2, else interface will be in Layer1"
+    #newvalues(:false,:true)
+  end
+
+  newproperty(:portmode) do
+    desc "property to set the portmode setting on the port"
+    newvalues('hybrid')
   end
 
 end
