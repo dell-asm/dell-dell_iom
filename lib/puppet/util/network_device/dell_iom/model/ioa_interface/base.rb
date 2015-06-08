@@ -120,7 +120,10 @@ module Puppet::Util::NetworkDevice::Dell_iom::Model::Ioa_interface::Base
           end
         end
 
-        transport.command("no vlan untagged")
+        # Untag VLAN needs to be updated only if there is a overlap of untag VLAN with existing list of tag vlans
+        untag_vlan = ( existing_config.scan(/vlan untagged\s+(.*?)$/m).flatten.first || '' )
+        transport.command("no vlan untagged") if temp_vlans.include?(untag_vlan)
+
         transport.command("no vlan tagged #{missing_vlans}") if !missing_vlans.nil?
         transport.command("vlan tagged #{vlans_toadd}") if !vlans_toadd.nil?
       end
