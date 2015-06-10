@@ -4,8 +4,6 @@
 Puppet::Type.newtype(:mxl_uplinkstategroup) do
   @doc = "This represents Dell Force10 MXL uplink-state-group configuration."
 
-  apply_to_device
-
   ensurable
 
   newparam(:name) do
@@ -18,19 +16,19 @@ Puppet::Type.newtype(:mxl_uplinkstategroup) do
       ( all_valid_characters and value.to_i.between?(1,16))
     end
   end
-  
+
   newproperty(:downstream_interface) do
     desc "Interface / Port-Channel that needs to be added to the downstream"
     isrequired
     newvalues(/^\Atengigabitethernet\s*\S+/i, /te\s*\S+$/i,/^fortygige\s*\S+$/i,/^fo\s*\S+$/i, /^Port-channel\s*\S+$/i)
   end
-  
+
   newproperty(:upstream_interface) do
     desc "Interface / Port-Channel that needs to be added to the upstream"
     isrequired
     newvalues(/^\Atengigabitethernet\s*\S+/i, /te\s*\S+$/i,/^fortygige\s*\S+$/i,/^fo\s*\S+$/i, /^Port-channel\s*\S+$/i)
   end
-  
+
   newproperty(:downstream_property) do
     desc "property that needs to be configured to the downstream"
     newvalues('auto-recover','disable')

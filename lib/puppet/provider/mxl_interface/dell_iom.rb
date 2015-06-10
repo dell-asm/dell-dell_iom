@@ -3,23 +3,20 @@
 require 'puppet/provider/dell_iom'
 
 Puppet::Type.type(:mxl_interface).provide :dell_iom, :parent => Puppet::Provider::Dell_iom do
-  desc "Dell MXL switch provider for interface configuration."
   mk_resource_methods
-  def initialize(device, *args)
-    super
-  end
+  desc "Dell MXL switch provider for interface configuration."
 
-  def self.lookup(device, name)
+  def self.get_current(name)
     if !name.nil?
       name=name.gsub(/te |tengigabitethernet /i, "TenGigabitEthernet ")
       name=name.gsub(/fo |fortygige /i, "fortyGigE ")
       name=name.gsub(/fc\s*/i, "fibreChannel ")
     end
-    device.switch.interface(name).params_to_hash
+    transport.switch.interface(name).params_to_hash
   end
 
   def flush
-    device.switch.interface(name).update(former_properties, properties)
+    transport.switch.interface(name).update(former_properties, properties)
     super
   end
 end

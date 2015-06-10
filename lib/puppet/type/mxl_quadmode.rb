@@ -1,12 +1,10 @@
 # Type for configuring quad mode for interfaces
 # Seperate resource is create for quad mode considering the complexity
 # Parameters are
-#     
+#
 
 Puppet::Type.newtype(:mxl_quadmode) do
   @doc = "This represents Dell MXL interface quad mode."
-
-  apply_to_device
 
   ensurable
 
@@ -15,7 +13,7 @@ Puppet::Type.newtype(:mxl_quadmode) do
     isrequired
     isnamevar
   end
-  
+
   newparam(:reboot_required) do
     desc "Flag to inidicate if switch needs to be rebooted after change."
     newvalues(:true,:false)

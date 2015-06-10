@@ -9,8 +9,6 @@
 Puppet::Type.newtype(:mxl_portchannel) do
   @doc = "This represents Dell MXL switch port-channel."
 
-  apply_to_device
-
   ensurable
 
   newparam(:name) do
@@ -51,7 +49,7 @@ Puppet::Type.newtype(:mxl_portchannel) do
     defaultto(:false)
     newvalues(:false,:true)
   end
-  
+
   newproperty(:fcoe_map) do
     desc "fcoe map that needs to be associated with the port-channel"
     validate do |value|
@@ -59,7 +57,7 @@ Puppet::Type.newtype(:mxl_portchannel) do
       raise ArgumentError, "Invalid fcoe-map name" unless all_valid_characters
     end
   end
-  
+
   newproperty(:fip_snooping_fcf) do
     desc "enable / disable fip-snooping fcf setting"
     newvalues(:false,:true)

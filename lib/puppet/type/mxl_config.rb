@@ -8,8 +8,6 @@
 Puppet::Type.newtype(:mxl_config) do
   @doc = "This will apply configuration on Dell MXL switch."
 
-  apply_to_device
-
   newparam(:name) do
     desc "Conifguration name, can be any unique name"
     isnamevar
