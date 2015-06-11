@@ -5,8 +5,6 @@
 Puppet::Type.newtype(:mxl_feature) do
   @doc = "This represents Dell MXL features."
 
-  apply_to_device
-
   ensurable
 
   newparam(:name) do
@@ -16,5 +14,5 @@ Puppet::Type.newtype(:mxl_feature) do
     newvalues('fip-snooping','fc')
   end
 
-  
+
 end

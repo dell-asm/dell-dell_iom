@@ -10,7 +10,7 @@
 Puppet::Type.newtype(:mxl_interface) do
   @doc = "This represents Dell MXL switch interface."
 
-  apply_to_device
+  ensurable
 
   newparam(:name) do
     desc "Interface name, which represents Interface."
@@ -49,7 +49,7 @@ Puppet::Type.newtype(:mxl_interface) do
     #defaultto(:false)
     newvalues(:false,:true)
   end
-  
+
   newproperty(:fcoe_map) do
     desc "fcoe map that needs to be associated with the interface"
     validate do |value|
@@ -57,7 +57,7 @@ Puppet::Type.newtype(:mxl_interface) do
       raise ArgumentError, "Invalid fcoe-map name" unless all_valid_characters
     end
   end
-  
+
   newproperty(:dcb_map) do
     desc "dcb map that needs to be associated with the interface"
     validate do |value|
@@ -65,7 +65,7 @@ Puppet::Type.newtype(:mxl_interface) do
       raise ArgumentError, "Invalid dcb-map name" unless all_valid_characters
     end
   end
-  
+
   newproperty(:fabric) do
     desc "fcoe-map that needs to be associated with Fiber-Channel Interface"
     validate do |value|

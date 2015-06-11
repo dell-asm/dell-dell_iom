@@ -6,7 +6,6 @@
 Puppet::Type.newtype(:ioa_mode) do
   @doc = 'This represents Dell IOA mode management.'
 
-  apply_to_device
   ensurable
 
   newparam(:name) do

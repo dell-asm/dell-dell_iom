@@ -8,8 +8,6 @@
 Puppet::Type.newtype(:ioa_interface) do
   @doc = "This represents Dell IOA interface."
 
-  apply_to_device
-
   newparam(:name) do
     desc "Interface name, represents interface."
     isrequired
