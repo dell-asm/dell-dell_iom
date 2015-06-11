@@ -105,8 +105,8 @@ describe PuppetX::Dell_iom::Model::Ioa_interface do
         @interface.update(@old_params, @new_params)
       end
 
-      it 'should remove untagged vlan if already tagged' do
-        @new_params[:vlan_tagged] = '20'
+      it 'should remove vlan as untagged if setting to tagged' do
+        @new_params[:vlan_tagged] = '18'
         @transport.should_receive(:command).with("no vlan untagged")
         @interface.update(@old_params, @new_params)
       end

@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'dell-force10', :git => 'https://github.com/dell-asm/dell-force10.git'
+
 group :development, :test do
   gem 'rake'
   gem 'rspec'
