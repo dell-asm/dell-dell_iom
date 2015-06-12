@@ -85,14 +85,15 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
         existing_config = transport.command("show config")
         tagged_vlan = ( existing_config.scan(/vlan tagged\s+(.*?)$/m).flatten.first || '' )
         vlans = tagged_vlan.split(",")
-        temp_vlans = []
+        # This array will just contain all the currently tagged vlans individually, instead of being in a range such as 1-5
+        unranged_tagged_vlans = []
         vlans.each_with_index do |vlan,index|
           if vlan.include?('-')
             vlan_range = vlan.split("-").flatten
             vlan_value = (vlan_range[0]..vlan_range[1]).to_a
-            temp_vlans.concat(vlan_value)
+            unranged_tagged_vlans.concat(vlan_value)
           else
-            temp_vlans.push(vlan)
+            unranged_tagged_vlans.push(vlan)
           end
         end
         requested_vlans = value.split(",").uniq.sort
@@ -108,20 +109,20 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
         missing_vlans = missing_vlans.to_ranges.join(",").gsub(/\.\./,'-')
         Puppet.debug "Missing VLAN Range: #{missing_vlans}"
 
-        if temp_vlans == requested_vlans
+        if unranged_tagged_vlans == requested_vlans
           Puppet.debug "No change"
         else
-          if temp_vlans.empty?
+          if unranged_tagged_vlans.empty?
             vlans_toadd = value
           else
-            requested_vlans.map { |x| vlans_toadd.push(x) if !temp_vlans.include?(x) }
+            requested_vlans.map { |x| vlans_toadd.push(x) if !unranged_tagged_vlans.include?(x) }
             vlans_toadd = vlans_toadd.compact.flatten.uniq.to_ranges.join(",").gsub(/\.\./,'-')
           end
         end
 
         # Untag VLAN needs to be updated only if there is a overlap of untag VLAN with existing list of tag vlans
         untag_vlan = ( existing_config.scan(/vlan untagged\s+(.*?)$/m).flatten.first || '' )
-        transport.command("no vlan untagged") if temp_vlans.include?(untag_vlan)
+        transport.command("no vlan untagged") if requested_vlans.include?(untag_vlan)
 
         transport.command("no vlan tagged #{missing_vlans}") if !missing_vlans.nil?
         transport.command("vlan tagged #{vlans_toadd}") if !vlans_toadd.nil?
