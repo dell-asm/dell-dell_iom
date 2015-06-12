@@ -25,7 +25,12 @@ Puppet::Type.newtype(:ioa_interface) do
     desc "Tag the given vlan numbers to the interface."
     munge do |value|
       #If the list is empty, we send back nil so Puppet doesn't try to do anything with the property
-      value.empty? ? nil : value
+      if value.empty?
+        nil
+      else
+        #Sorting the values makes it easier to compare later.
+        value.split(',').sort.join(',')
+      end
     end
     validate do |value|
       return if value == :absent || value.empty?
