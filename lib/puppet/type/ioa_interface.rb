@@ -34,15 +34,14 @@ Puppet::Type.newtype(:ioa_interface) do
     end
     validate do |value|
       return if value == :absent || value.empty?
-      all_valid_characters = value =~ /^[0-9]+$/
-      paramsarray=value.match(/(\d*)\s*[,-]\s*(\d*)/)
-      param1 = paramsarray[1]
-      param2 = paramsarray[2]
-      all_valid_characters = param1 =~ /^[0-9]+$/
-      raise ArgumentError, "An invalid VLAN ID #{param1} is entered.The VLAN ID must be between 1 and 4094." unless all_valid_characters && param1.to_i >= 1 && param1.to_i <= 4094
-      all_valid_characters = param2=~ /^[0-9]+$/
-      raise ArgumentError, "An invalid VLAN ID #{param2} is entered.The VLAN ID must be between 1 and 4094." unless all_valid_characters && param2.to_i >= 1 && param2.to_i <= 4094
-      raise ArgumentError, "An invalid VLAN ID #{value} is entered. The VLAN ID must be between 1 and 4094." unless all_valid_characters && value.to_i >= 1 && value.to_i <= 4094
+      raise ArgumentError, "Invalid vlan list: #{value}" if value.include?(',') && !(value.split(',').size > 0)
+      value.split(',').each do |vlan_value|
+        raise ArgumentError, "Invalid range definition: #{value}" if value.include?('-') && value.split('-').size != 2
+        vlan_value.split('-').each do |vlan|
+          all_valid_characters = vlan =~ /^[0-9]+$/
+          raise ArgumentError, "An invalid VLAN ID #{vlan_value} is entered.All VLAN values must be between 1 and 4094." unless all_valid_characters && vlan.to_i >= 1 && vlan.to_i <= 4094
+        end
+      end
     end
 
   end
