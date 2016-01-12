@@ -128,9 +128,7 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
         transport.command("vlan tagged #{vlans_toadd}") if !vlans_toadd.nil?
       end
 
-      remove do |transport, old_value|
-        transport.command("no vlan tagged #{old_value}")
-      end
+      remove { |*_| }
     end
 
     ifprop(base, :vlan_untagged) do
