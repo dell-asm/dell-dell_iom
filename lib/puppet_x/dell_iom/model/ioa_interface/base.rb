@@ -60,6 +60,7 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
         existing_config=(transport.command('show config') || '').split("\n").reverse
         updated_config = existing_config.find_all {|x| x.match(/dcb|switchport|spanning|vlan/)}
         updated_config.each do |remove_command|
+          remove_command = remove_command.split(" ")[0..-2].join(" ") if remove_command.match /vlan untagged/
           transport.command("no #{remove_command}")
         end
         transport.command('portmode hybrid')
