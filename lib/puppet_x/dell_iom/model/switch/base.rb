@@ -11,6 +11,7 @@ require 'puppet_x/force10/model/quadmode'
 require 'puppet_x/dell_iom/model'
 require 'puppet_x/dell_iom/model/switch'
 require 'puppet_x/dell_iom/model/ioa_interface'
+require 'puppet_x/dell_iom/model/ioa_autolag'
 
 module PuppetX::Dell_iom::Model::Switch::Base
   def self.register(base)
