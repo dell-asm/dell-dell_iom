@@ -11,6 +11,7 @@ Puppet::Type.type(:ioa_mode).provide :dell_iom, :parent => Puppet::Provider::Del
       name=name.to_s.gsub(/smux/i, "standalone")
       name=name.to_s.gsub(/pmux/i, "programmable-mux")
       name=name.to_s.gsub(/vlt/i, "vlt")
+      name=name.to_s.gsub(/fullswitch/i, "fullswitch")
     end
     transport.switch.ioa_mode(name).params_to_hash
   end
