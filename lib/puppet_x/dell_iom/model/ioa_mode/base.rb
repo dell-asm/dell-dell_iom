@@ -55,7 +55,6 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
             transport.command('stack-unit 0 port-group 0 portmode ethernet',:prompt => /confirm.*/ )
             transport.command('yes')
             transport.command('end')
-
             # Save the configuration and reload switch
             transport.command('enable')
             transport.command('write memory')
@@ -88,7 +87,8 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
 
       desired_iom_mode = 'programmable-mux' if base.name.downcase.match(/pmux|programmable*/)
       desired_iom_mode = 'standalone' if base.name.downcase.match(/smux|stand*/)
-      desired_iom_mode = 'vlt' if base.name.downcase.match(/vlt*/)
+      desired_iom_mode = 'pmux_vlt' if base.name.downcase.match(/vlt*/)
+      desired_iom_mode ='full-switch' if base.name.downcase.match(/fullswitch*/)
       Puppet.debug("desired iom mode: #{desired_iom_mode}")
       match do |txt|
         Puppet.debug("TXT for matching: #{txt}")
@@ -98,13 +98,12 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
 
       if base.facts['iom_mode'] != desired_iom_mode
         # For VLT, change the switch to ethernet mode for FN 2210S IOA
-        if desired_iom_mode == 'vlt' and base.facts['product_name'].match(/2210/) and base.facts['ioa_ethernet_mode'].nil?
+        if desired_iom_mode == 'pmux_vlt' and base.facts['product_name'].match(/2210/) and base.facts['ioa_ethernet_mode'].nil?
           transport.command('enable')
           transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
-          transport.command('stack-unit 0 port-group 0 portmode ethernet',:prompt => /confirm.*/ )
+          transport.command('stack-unit 0 port-group 0 portmode ethernet', :prompt => /confirm.*/)
           transport.command('yes')
           transport.command('end')
-
           # Save the configuration and reload switch
           transport.command('enable')
           transport.command('write memory')
@@ -126,18 +125,22 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
         end
         transport.command('enable')
         transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
-        transport.command("stack-unit 0 iom-mode #{desired_iom_mode}")
+        if desired_iom_mode.eql? 'pmux_vlt'
+          transport.command('stack-unit 0 iom-mode programmable-mux')
+        else
+          transport.command("stack-unit 0 iom-mode #{desired_iom_mode}")
+        end
         transport.command('end')
         # Save the configuration and reload switch
         transport.command('write memory')
         transport.command('reload', :prompt => /confirm.*/)
         transport.command('yes')
         base.facts['iom_mode'] = desired_iom_mode
-
         # Close connection and call connect method to restore the connection
         transport.close
         # Sleeping for a minute
         (1..5).each do |retry_count|
+          Puppet.debug("sleeping for 1 minute and the trying to connect")
           sleep(60)
           begin
             transport.connect
@@ -150,9 +153,132 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
           end
         end
       end
+      add { |*_|}
+      remove { |*_|}
+    end
 
-      add { |*_| }
-      remove { |*_| }
+    ifprop(base, :port_channel) do
+      add do |transport, value|
+        base.port = value
+      end
+    end
+
+    ifprop(base, :destination_ip) do
+      add do |transport, value|
+        base.destination_ip = value
+      end
+    end
+
+    ifprop(base, :unit_id) do
+      add do |transport, value|
+        base.device_id = value
+      end
+    end
+
+    ifprop(base, :interface) do
+      add do |transport, value|
+        interfaceports = JSON.parse(value)
+        interfaceports.each do |i|
+          i.gsub!('Fo', 'fortyGigE')
+          i.gsub!('Te', 'Tengigabitethernet')
+        end
+        interfaceports.each do |interface|
+          transport.command('enable')
+          transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
+          transport.command("int #{interface}")
+          transport.command('no shutdown')
+          transport.command('end')
+        end
+        base.interfaceport = interfaceports
+        PuppetX::Dell_iom::Model::Ioa_mode::Base.configure_vlt_setting(transport, base.interfaceport, base.destination_ip, base.device_id, base.port)
+      end
+    end
+  end
+
+  def self.configure_vlt_setting(transport, interface_ports, destination_ip, device_id, port_channel)
+    vltdomain = {}
+    vltdomain['port_channel'] = port_channel
+    vltdomain['ip_destination'] = destination_ip
+    vltdomain['unit-id'] = device_id
+    PuppetX::Dell_iom::Model::Ioa_mode::Base.remove_vlt_uplinks(transport)
+    PuppetX::Dell_iom::Model::Ioa_mode::Base.configureportchannel(transport, port_channel, interface_ports)
+    PuppetX::Dell_iom::Model::Ioa_mode::Base.configure_vltdomain(transport, vltdomain)
+  end
+
+  def self.configureportchannel(transport, port_channel, interface_port)
+    transport.command('enable')
+    transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
+    interface_port.each do |interface|
+      transport.command("int #{interface}")
+      port_channel_protocol_results = transport.command('show config')
+      if port_channel_protocol_results.include? "port-channel-protocol"
+        transport.command('no port-channel-protocol lacp')
+        transport.command('exit')
+      end
+    end
+    transport.command("interface port-channel #{port_channel}")
+    interface_port.each do |port|
+      transport.command("channel-member #{port}")
+    end
+    transport.command('no shutdown')
+    transport.command('end')
+  end
+
+  def self.configure_vltdomain(transport, vlt)
+    transport.command('enable')
+    transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
+    transport.command('vlt domain 1')
+    transport.command("peer-link port-channel #{vlt["port_channel"]}")
+    transport.command("back-up destination #{vlt["ip_destination"]}")
+    transport.command("unit-id #{vlt["unit-id"]}")
+    transport.command('end')
+  end
+
+  def self.remove_vlt_uplinks(transport)
+    Puppet.debug("removing existing uplinks")
+    PuppetX::Dell_iom::Model::Ioa_mode::Base.remove_vlt_domain_setting_uplink(transport)
+    existingportschannels = PuppetX::Dell_iom::Model::Ioa_mode::Base.get_existing_port_channels(transport)
+    transport.command('enable')
+    transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
+    existingportschannels.each do |portchannel|
+      transport.command("int port-channel #{portchannel}")
+      cmdout=transport.command('show config')
+      portconfig=cmdout.split("\n")
+      portconfig.each do |line|
+        if line.include? 'channel-member'
+          transport.command("no #{line}")
+          transport.command('shutdown')
+        end
+      end
+      transport.command('exit')
+      transport.command("no interface port-channel #{portchannel}")
+    end
+    transport.command('end')
+  end
+
+  def self.remove_vlt_domain_setting_uplink(transport)
+    Puppet.debug(" removing existing vlt port settings")
+    transport.command('enable')
+    transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
+    transport.command('vlt domain 1')
+    vlt_domaindata=transport.command('show config')
+    if vlt_domaindata.include? 'peer-link port-channel'
+      transport.command('no peer-link')
+    end
+    transport.command('end')
+  end
+
+  def self.get_existing_port_channels(transport)
+    existingportschannels=[]
+    port_Channels= transport.command('show interface port-channel brief')
+    if !port_Channels.include? "No such interface"
+      cmdresult=port_Channels.split("\n")
+      cmdresult.each do |line|
+        if line =~ /\s(\d+\s)/
+          existingportschannels << $1
+        end
+      end
+      existingportschannels
     end
   end
 

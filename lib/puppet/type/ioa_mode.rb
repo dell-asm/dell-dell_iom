@@ -30,5 +30,33 @@ Puppet::Type.newtype(:ioa_mode) do
     newvalues(:true,:false)
   end
 
+  newproperty(:port_channel) do
+    desc 'for vlt peer-port channel'
+    validate do |value|
+      return if value == :absent || value.empty?
+    end
+  end
+
+  newproperty(:destination_ip) do
+    desc 'vlt destination_ip for backup link'
+    validate do |value|
+      return if value == :absent || value.empty?
+    end
+  end
+
+  newproperty(:unit_id) do
+    desc 'device_id for priority'
+    validate do |value|
+      return if value == :absent || value.empty?
+    end
+  end
+
+  newproperty(:interface) do
+    desc 'interface ports to be assigned to the port channel'
+    validate do |value|
+      return if value == :absent || value.empty?
+    end
+  end
+
 end
 

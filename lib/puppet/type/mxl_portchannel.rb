@@ -63,4 +63,9 @@ Puppet::Type.newtype(:mxl_portchannel) do
     newvalues(:false,:true)
   end
 
+  newproperty(:vltpeer) do
+    desc "enable / disable fip-snooping fcf setting"
+    newvalues(:false,:true)
+  end
+
 end
