@@ -37,6 +37,14 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
       remove { |*_| }
     end
 
+    ifprop(base, :vlt) do
+      add do |transport, value|
+        if value.eql? :false
+          PuppetX::Dell_iom::Model::Ioa_mode::Base.remove_vlt_domain_setting_uplink(transport)
+        end
+      end
+    end
+
     ifprop(base, :ioa_ethernet_mode) do
       Puppet.debug("IOA Ethernet mode , base name: #{base.name}")
       match do |txt|

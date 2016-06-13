@@ -15,6 +15,11 @@ Puppet::Type.newtype(:ioa_mode) do
     isnamevar
   end
 
+  newproperty(:vlt) do
+    desc 'flag to  remove existing vlt configuration'
+    newvalues(:true, :false)
+  end
+
   newproperty(:default_configuration) do
     desc 'Flag to manage the default configuration change of the switch. true - change the configuration to default'
     newvalues(:true,:false)
@@ -33,7 +38,7 @@ Puppet::Type.newtype(:ioa_mode) do
   newproperty(:port_channel) do
     desc 'for vlt peer-port channel'
     validate do |value|
-      return if value == :absent || value.empty?
+      return if value == :absent || value.nil?
     end
   end
 
