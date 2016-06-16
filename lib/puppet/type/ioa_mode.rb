@@ -10,7 +10,7 @@ Puppet::Type.newtype(:ioa_mode) do
 
   newparam(:name) do
     desc 'Mode that needs to be configured on the switch, if not already configured'
-    newvalues('smux','pmux','vlt','fullswitch')
+    newvalues('smux','pmux','vlt','fullswitch','vlt_settings')
     isrequired
     isnamevar
   end

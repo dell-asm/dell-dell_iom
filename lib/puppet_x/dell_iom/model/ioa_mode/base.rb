@@ -92,10 +92,10 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
     #TODO:  This is pretty inconsistent with the way we usually do the properties.  Usually it's in the "add" block.  Might be nice to change for consistency's sake.
     ifprop(base, :iom_mode) do
       Puppet.debug("Base name: #{base.name}")
-
+      if !base.name.downcase.match(/vlt_settings/)
       desired_iom_mode = 'programmable-mux' if base.name.downcase.match(/pmux|programmable*/)
       desired_iom_mode = 'standalone' if base.name.downcase.match(/smux|stand*/)
-      desired_iom_mode = 'pmux_vlt' if base.name.downcase.match(/vlt*/)
+      desired_iom_mode = 'pmux_vlt' if base.name.downcase.match(/^vlt/)
       desired_iom_mode ='full-switch' if base.name.downcase.match(/fullswitch*/)
       Puppet.debug("desired iom mode: #{desired_iom_mode}")
       match do |txt|
@@ -160,6 +160,7 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
             Puppet.debug("Failed to connect, retry counter #{retry_count}")
           end
         end
+      end
       end
       add { |*_|}
       remove { |*_|}
