@@ -129,10 +129,17 @@ describe PuppetX::Dell_iom::Model::Ioa_mode do
     @transport.should_receive(:command).ordered.with('enable')
     @transport.should_receive(:command).ordered.with('configure terminal', :prompt => /\(conf\)#\z/n)
     @transport.should_receive(:command).ordered.with('vlt domain 1')
-    @transport.should_receive(:command).ordered.with('show config').and_return('peer-link port-channel')
+    @transport.should_receive(:command).ordered.with('show config').and_return('peer-link port-channel',"show config\n!\nuplink-state-group 1\n downstream Port-channel 128,32\n upstream Port-channel 2,3\n1newiom1(conf-uplink-state-group-1)#")
     @transport.should_receive(:command).ordered.with('no peer-link')
     PuppetX::Dell_iom::Model::Ioa_mode::Base.remove_vlt_domain_setting_uplink(@transport)
   end
 
+  it 'should remove existing port-channels form active-state-group' do
+    PuppetX::Dell_iom::Model::Ioa_mode.new(@transport, facts, {:name => 'pmux_vlt'})
+    @transport.should_receive(:command).with('show config').and_return('peer-link port-channel',"show config\n!\nuplink-state-group 1\n downstream Port-channel 128,32\n upstream Port-channel 2,3\n1newiom1(conf-uplink-state-group-1)#")
+    @transport.should_receive(:command).with('end')
+    @transport.should_receive(:command).with('uplink-state-group 1')
+    PuppetX::Dell_iom::Model::Ioa_mode::Base.remove_vlt_domain_setting_uplink(@transport)
+  end
 
 end

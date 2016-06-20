@@ -91,6 +91,7 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
 
     #TODO:  This is pretty inconsistent with the way we usually do the properties.  Usually it's in the "add" block.  Might be nice to change for consistency's sake.
     ifprop(base, :iom_mode) do
+
       Puppet.debug("Base name: #{base.name}")
       if !base.name.downcase.match(/vlt_settings/)
       desired_iom_mode = 'programmable-mux' if base.name.downcase.match(/pmux|programmable*/)
@@ -274,6 +275,13 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
     if vlt_domaindata.include? 'peer-link port-channel'
       transport.command('no peer-link')
     end
+    transport.command('exit')
+    transport.command('uplink-state-group 1')
+    uplink_state_group = transport.command('show config')
+    uplink_state_group.split("\n").map{|line|
+      next unless line =~ /upstream Port-channel\s\d.*/ || line =~ /downstream Port-channel\s\d.*/
+      transport.command("no #{line}")
+    }
     transport.command('end')
   end
 
