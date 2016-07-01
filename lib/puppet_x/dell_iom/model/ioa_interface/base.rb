@@ -50,6 +50,14 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
       remove { |*_| }
     end
 
+    ifprop(base, :mtu) do
+      match /^\s*mtu\s+(.*?)\s*$/
+      add do |transport, value|
+        transport.command("mtu #{value}")
+      end
+      remove { |*_| }
+    end
+
     ifprop(base, :portmode) do
       match do |txt|
         txt =~ /Hybrid/i ? :hybrid : nil
@@ -57,7 +65,7 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
 
       add do |transport, value|
         Puppet.debug('Need to remove existing configuration to set portmode')
-        existing_config=(transport.command('show config') || '').split("\n").reverse
+        existing_config = (transport.command('show config') || '').split("\n").reverse
         updated_config = existing_config.find_all {|x| x.match(/dcb|switchport|spanning|vlan/)}
         updated_config.each do |remove_command|
           remove_command = remove_command.split(" ")[0..-2].join(" ") if remove_command.match /vlan untagged/
@@ -153,9 +161,7 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
       end
     end
 
-    general_scope = /^((#{interfaceval}).*)/m
-
-    base.register_scoped :shutdown, general_scope do
+    ifprop(base, :shutdown) do
       match do |txt|
         paramsarray=txt.match(/^#{interfaceval} is up/)
         if paramsarray.nil?
@@ -176,6 +182,33 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
       end
       remove { |*_| }
     end
+
+    ifprop(base, :portchannel) do
+      match /^  port-channel (\d+)\s+.*$/
+      add do |transport, value|
+        Puppet.debug("Need to remove existing configuration")
+        existing_config = (transport.command("show config") || "").split("\n").reverse
+        updated_config = existing_config.find_all do |x|
+          x.match(/dcb|switchport|spanning|vlan|portmode/)
+        end
+        updated_config.each do |remove_command|
+          transport.command("no #{remove_command}")
+        end
+
+        existing_config = (transport.command("show config") || "").split("\n")
+        # Remove existing port channel if one exists
+        if existing_config.find {|line| line =~ /port-channel/}
+          transport.command("no port-channel-protocol lacp")
+        end
+        transport.command("port-channel-protocol lacp")
+        transport.command("port-channel #{value} mode active")
+      end
+      remove do |transport, value|
+        transport.command("no port-channel-protocol lacp")
+      end
+    end
+
+
 
   end
 end
