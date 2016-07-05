@@ -5,6 +5,7 @@ require 'puppet_x/dell_iom/model'
 class PuppetX::Dell_iom::Model::Ioa_interface < PuppetX::Force10::Model::Base
 
   attr_reader :params, :name
+
   def initialize(transport, facts, options)
     super(transport, facts)
     # Initialize some defaults

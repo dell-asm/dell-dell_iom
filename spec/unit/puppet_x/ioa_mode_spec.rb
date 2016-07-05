@@ -41,12 +41,6 @@ describe PuppetX::Dell_iom::Model::Ioa_mode do
     iom_mode = PuppetX::Dell_iom::Model::Ioa_mode.new(@transport, facts, {:name => 'standalone'})
   end
 
-  it 'should not set any mode for mxl switch' do
-    @transport.should_not_receive(:command)
-    facts = {'ioa_ethernet_mode' => 'mock', 'iom_mode' => 'pmux_vlt'}
-    iom_mode = PuppetX::Dell_iom::Model::Ioa_mode.new(@transport, facts, {:name => 'vlt_settings'})
-  end
-
   it 'should set programmable-mux mode' do
     @transport.should_receive(:command).with('stack-unit 0 iom-mode programmable-mux')
     facts = {'ioa_ethernet_mode' => 'mock', 'iom_mode' => 'standalone'}
