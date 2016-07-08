@@ -44,6 +44,11 @@ Puppet::Type.newtype(:mxl_portchannel) do
     newvalues(:false,:true)
   end
 
+  newproperty(:portmode) do
+    desc "property to set the portmode setting on the port"
+    newvalues("hybrid")
+  end
+
   newproperty(:shutdown) do
     desc "The shutdown flag of the Port-channel, true means Shutdown else no shutdown"
     defaultto(:false)
@@ -65,6 +70,12 @@ Puppet::Type.newtype(:mxl_portchannel) do
 
   newproperty(:vltpeer) do
     desc "enable / disable fip-snooping fcf setting"
+    newvalues(:false,:true)
+  end
+
+  newproperty(:ungroup) do
+    desc "Force this port-channel's members to become switchports if not up"
+    defaultto(:false)
     newvalues(:false,:true)
   end
 
