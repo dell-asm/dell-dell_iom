@@ -188,6 +188,14 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
       add do |transport, value|
         interfaceports = JSON.parse(value)
         interfaceports.each do |i|
+          # checks if interface port is taken as fc as fc is not available in full-switch mode
+          # changes to Te if iom is in full-switch mode
+          if i.include?("Fc")
+            if base.facts["iom_mode"] == "full-switch"
+              i.gsub!('Fc', 'Te')
+            end
+          end
+
           i.gsub!('Fo', 'fortyGigE')
           i.gsub!('Te', 'Tengigabitethernet')
         end
