@@ -222,8 +222,13 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
         updated_config = existing_config.find_all do |x|
           x.match(/dcb|switchport|spanning|vlan|portmode/)
         end
+
         updated_config.each do |remove_command|
-          transport.command("no #{remove_command}")
+          if remove_command =~ /untagged/
+            transport.command("no vlan untagged")
+          else
+            transport.command("no #{remove_command}")
+          end
         end
 
         existing_config = (transport.command("show config") || "").split("\n")
