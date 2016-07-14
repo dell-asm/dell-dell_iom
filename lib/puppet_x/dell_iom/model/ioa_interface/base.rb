@@ -92,16 +92,15 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
       add do |transport, value|
         if base.facts["system_type"].match(/PE-FN.*-IOM/) && base.facts["iom_mode"].eql?("full-switch")
           transport.command("exit")
-          value.split(',').map{ |value|
+          value.split(',').each do |value|
             transport.command("interface vlan #{value}")
             existing_config = transport.command("show config")
-            existing_config.split("\n").map{|line|
+            existing_config.split("\n").each do  |line|
               (transport.command("no #{line}")) if line =~ /tagged TenGigabitEthernet\s\d+..*/
               (transport.command("no #{line}")) if line =~ /untagged TenGigabitEthernet\s\d+..*/
-            }
+            end
             transport.command("tagged #{scope_name}")
-            transport.command("tagged #{exit}")
-          }
+          end
           transport.command("interface #{scope_name}")
         else
           # Find the VLANS which are already configured
