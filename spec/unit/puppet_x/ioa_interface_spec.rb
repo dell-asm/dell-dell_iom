@@ -89,7 +89,7 @@ describe PuppetX::Dell_iom::Model::Ioa_interface do
       end
     end
 
-    describe 'when adding vlans when switch is in full-switch mode' do
+    describe 'when adding vlans & switch is in full-switch mode' do
       let(:facts){{"system_type"=>"PE-FN-410S-IOM", "iom_mode" => "full-switch"}}
       before do
         name = 'TenGigabitEthernet 0/3'
@@ -115,7 +115,9 @@ describe PuppetX::Dell_iom::Model::Ioa_interface do
         @transport.should_receive(:command).with("interface vlan 18" )
         @transport.should_receive(:command).with("show config").and_return("untagged TenGigabitEthernet 0/4\n \ntagged Port-channel 15")
         @transport.should_receive(:command).with("no untagged TenGigabitEthernet 0/4" )
-        @transport.should_receive(:command).with("tagged TenGigabitEthernet 0/3" )
+        @transport.should_receive(:command).with("untagged TenGigabitEthernet 0/3" )
+        @transport.should_receive(:command).with("exit")
+        @transport.should_receive(:command).with("interface TenGigabitEthernet 0/3" )
         @interface.update(@old_params, @new_params)
       end
 
