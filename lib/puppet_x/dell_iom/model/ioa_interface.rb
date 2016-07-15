@@ -42,11 +42,6 @@ class PuppetX::Dell_iom::Model::Ioa_interface < PuppetX::Force10::Model::Base
     super
 
     transport.command("interface #{@name}", :prompt => /\(conf-if-\S+\)#\z/n)
-
-    # Remove interface from portchannel unless we're trying to set it up on one
-    unless params_to_update.find{|param| param.name == :portchannel}
-      transport.command("no port-channel-protocol lacp")
-    end
   end
 
   def after_update
