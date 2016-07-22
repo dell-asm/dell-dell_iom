@@ -203,6 +203,11 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
           end
         end
 
+        # ASM-7311 even if the port doesn't say it's in switchport mode,the
+        # 'no switchport' command is still necessary at times, otherwise the lacp
+        # commands will fail. Shouldn't hurt to just run the command everytime
+        transport.command("no switchport")
+
         existing_config = (transport.command("show config") || "").split("\n")
         # Remove existing port channel if one exists
         if existing_config.find {|line| line =~ /port-channel/}
