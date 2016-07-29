@@ -245,8 +245,5 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
         transport.command("no port-channel-protocol lacp")
       end
     end
-
-
-
   end
 end

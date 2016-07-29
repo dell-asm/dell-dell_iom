@@ -1,13 +1,5 @@
-# Type for MXL Port-channel
-# Parameters are
-#     name - Port-channel name
-# Properties are
-#   desc - description for Port-channel
-#   mtu - mtu value for Port-channel
-#   shutdown - The shutdown flag of the Port-channel, true means Shutdown else no shutdown
-
-Puppet::Type.newtype(:mxl_portchannel) do
-  @doc = "This represents Dell MXL switch port-channel."
+Puppet::Type.newtype(:ioa_portchannel) do
+  @doc = "This represents Dell IOA switch port-channel."
 
   ensurable
 
@@ -24,7 +16,7 @@ Puppet::Type.newtype(:mxl_portchannel) do
   end
 
   newproperty(:desc) do
-    desc "Port-channel Description"
+    desc "Port-channel description"
     newvalues(/^(\w\s*)*?$/)
   end
 
@@ -39,18 +31,19 @@ Puppet::Type.newtype(:mxl_portchannel) do
   end
 
   newproperty(:switchport) do
-    desc "The switchport flag of the Port-channel, true mean move the port-channel to Layer2, else interface will be in Layer1"
+    desc "The switchport flag of the port-channel, true means move the port-channel to Layer2, else interface will be in Layer1"
     defaultto(:false)
     newvalues(:false,:true)
   end
 
-  newproperty(:portmode) do
-    desc "property to set the portmode setting on the port"
-    newvalues("hybrid")
+  newproperty(:ungroup) do
+    desc "Force this port-channel's members to become switchports if not up"
+    defaultto(:false)
+    newvalues(:false,:true)
   end
 
   newproperty(:shutdown) do
-    desc "The shutdown flag of the Port-channel, true means Shutdown else no shutdown"
+    desc "The shutdown flag of the port-channel, true means Shutdown else no shutdown"
     defaultto(:false)
     newvalues(:false,:true)
   end
@@ -63,20 +56,41 @@ Puppet::Type.newtype(:mxl_portchannel) do
     end
   end
 
-  newproperty(:fip_snooping_fcf) do
-    desc "enable / disable fip-snooping fcf setting"
-    newvalues(:false,:true)
+  newproperty(:portmode) do
+    desc "property to set the portmode setting on the port"
+    newvalues("hybrid")
   end
 
-  newproperty(:vltpeer) do
-    desc "enable / disable fip-snooping fcf setting"
-    newvalues(:false,:true)
+  newproperty(:tagged_vlan) do
+    desc "Tag the given vlan numbers to the interface."
+    munge do |value|
+      # Nil value ensures Puppet won't do anything
+      #Sorting the values makes it easier to compare later.
+      value.split(',').sort.join(',')
+    end
+    validate do |value|
+      return if value == :absent || value.empty?
+      raise ArgumentError, "Invalid vlan list: #{value}" if value.include?(',') && !(value.split(',').size > 0)
+      value.split(',').each do |vlan_value|
+        raise ArgumentError, "Invalid range definition: #{value}" if value.include?('-') && value.split('-').size != 2
+        vlan_value.split('-').each do |vlan|
+          Puppet::Type::Ioa_portchannel.validate_vlan(vlan)
+        end
+      end
+    end
+
   end
 
-  newproperty(:ungroup) do
-    desc "Force this port-channel's members to become switchports if not up"
-    defaultto(:false)
-    newvalues(:false,:true)
+  newproperty(:untagged_vlan) do
+    desc "untag the given vlan numbers to the interface."
+    munge do |value|
+      # Nil value ensures Puppet won't do anything
+      value.empty? ? nil : value
+    end
+    validate do |value|
+      return if value == :absent || value.empty?
+      Puppet::Type::Ioa_portchannel.validate_vlan(value)
+    end
   end
 
   newproperty(:portfast) do
@@ -91,34 +105,9 @@ Puppet::Type.newtype(:mxl_portchannel) do
     end
   end
 
-  newproperty(:tagged_vlan) do
-    desc "Tag the given vlan numbers to the interface."
-    munge do |value|
-      #Sorting the values makes it easier to compare later.
-      value.split(',').sort.join(',')
-    end
-    validate do |value|
-      return if value == :absent || value.empty?
-      raise ArgumentError, "Invalid vlan list: #{value}" if value.include?(',') && !(value.split(',').size > 0)
-      value.split(',').each do |vlan_value|
-        raise ArgumentError, "Invalid range definition: #{value}" if value.include?('-') && value.split('-').size != 2
-        vlan_value.split('-').each do |vlan|
-          Puppet::Type::Mxl_portchannel.validate_vlan(vlan)
-        end
-      end
-    end
-  end
-
-  newproperty(:untagged_vlan) do
-    desc "untag the given vlan numbers to the interface."
-    munge do |value|
-      # Nil value ensures Puppet won't do anything
-      value.empty? ? nil : value
-    end
-    validate do |value|
-      return if value == :absent || value.empty?
-      Puppet::Type::Mxl_portchannel.validate_vlan(value)
-    end
+  newproperty(:vltpeer) do
+    desc "property to set vlt-peer-lag property to this portchannel's value"
+    newvalues(:true, :false)
   end
 
   def self.validate_vlan(vlan)
