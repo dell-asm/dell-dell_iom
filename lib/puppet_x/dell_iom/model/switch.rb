@@ -11,6 +11,7 @@ require 'puppet_x/force10/model/portchannel'
 require 'puppet_x/force10/model/quadmode'
 require 'puppet_x/dell_iom/model'
 require 'puppet_x/dell_iom/model/ioa_interface'
+require 'puppet_x/dell_iom/model/ioa_portchannel'
 require 'puppet_x/dell_iom/model/ioa_mode'
 require 'puppet_x/dell_iom/model/ioa_autolag'
 
@@ -78,7 +79,8 @@ class PuppetX::Dell_iom::Model::Switch < PuppetX::Force10::Model::Base
   [
     :ioa_interface,
     :ioa_mode,
-    :ioa_autolag
+    :ioa_autolag,
+    :ioa_portchannel
   ].each do |key|
     define_method key.to_s do |name|
       #grp = params[key].value.find { |resourcegrp| resourcegrp.name == name }
