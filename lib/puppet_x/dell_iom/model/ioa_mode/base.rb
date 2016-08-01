@@ -71,7 +71,7 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
             # Close connection and call connect method to restore the connection
             transport.close
             # Sleeping for a minute
-            (1..5).each do |retry_count|
+            (1..9).each do |retry_count|
               sleep(60)
               begin
                 transport.connect
