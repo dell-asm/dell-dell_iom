@@ -32,6 +32,7 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
     end
 
     ifprop(base, :switchport) do
+      after :portmode
       match do |switchporttxt|
         unless switchporttxt.nil?
           switchporttxt.downcase.include? "vlan membership"
