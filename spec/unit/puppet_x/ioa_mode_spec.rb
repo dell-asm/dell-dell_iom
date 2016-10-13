@@ -104,6 +104,22 @@ describe PuppetX::Dell_iom::Model::Ioa_mode do
     PuppetX::Dell_iom::Model::Ioa_mode::Base.remove_vlt_uplinks(@transport)
   end
 
+  it "should also handle uplinks if no port-channel was found" do
+    facts = {'ioa_ethernet_mode' => 'mock', 'iom_mode' => 'standalone', 'product_name' => 'iomock-2100'}
+    model.should_receive(:remove_vlt_domain_setting_uplink).with(@transport)
+    model.should_receive(:get_existing_port_channels).with(@transport).and_return(nil)
+    @transport.should_receive(:command).ordered.with('enable')
+    @transport.should_receive(:command).ordered.with('configure terminal', :prompt => /\(conf\)#\z/n)
+    @transport.should_not_receive(:command).with('int port-channel 128 ')
+    @transport.should_not_receive(:command).with('show config')
+    @transport.should_not_receive(:command).with('no channel-member Te0/44')
+    @transport.should_not_receive(:command).with('shutdown')
+    @transport.should_not_receive(:command).with('exit')
+    @transport.should_not_receive(:command).with('no interface port-channel 128 ')
+    @transport.should_receive(:command).ordered.with('end')
+    PuppetX::Dell_iom::Model::Ioa_mode::Base.remove_vlt_uplinks(@transport)
+  end
+
   it 'should configure vlt settings' do
     facts = {'ioa_ethernet_mode' => 'mock', 'iom_mode' => 'standalone', 'product_name' => 'iomock-2100'}
     interface_port=["Tengigabitethernet 0/33", "Tengigabitethernet 0/37"]

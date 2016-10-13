@@ -257,18 +257,20 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
     existingportschannels = PuppetX::Dell_iom::Model::Ioa_mode::Base.get_existing_port_channels(transport)
     transport.command('enable')
     transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
-    existingportschannels.each do |portchannel|
-      transport.command("int port-channel #{portchannel}")
-      cmdout=transport.command('show config')
-      portconfig=cmdout.split("\n")
-      portconfig.each do |line|
-        if line.include? 'channel-member'
-          transport.command("no #{line}")
-          transport.command('shutdown')
+    if existingportschannels
+      existingportschannels.each do |portchannel|
+        transport.command("int port-channel #{portchannel}")
+        cmdout=transport.command('show config')
+        portconfig=cmdout.split("\n")
+        portconfig.each do |line|
+          if line.include? 'channel-member'
+            transport.command("no #{line}")
+            transport.command('shutdown')
+          end
         end
+        transport.command('exit')
+        transport.command("no interface port-channel #{portchannel}")
       end
-      transport.command('exit')
-      transport.command("no interface port-channel #{portchannel}")
     end
     transport.command('end')
   end
