@@ -35,10 +35,14 @@ Puppet::Type.newtype(:ioa_mode) do
     newvalues(:true,:false)
   end
 
+  newproperty(:mtu) do
+    desc 'mtu for VLT port-channel and interface port'
+  end
+
   newproperty(:port_channel) do
     desc 'for vlt peer-port channel'
     validate do |value|
-      return if value == :absent || value.nil?
+       return if value == :absent || value.nil?
     end
   end
 
@@ -59,7 +63,7 @@ Puppet::Type.newtype(:ioa_mode) do
   newproperty(:interface) do
     desc 'interface ports to be assigned to the port channel'
     validate do |value|
-      return if value == :absent || value.empty?
+    return if value == :absent || value.empty?
     end
   end
 

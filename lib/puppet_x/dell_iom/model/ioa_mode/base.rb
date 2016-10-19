@@ -166,6 +166,12 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
       remove { |*_|}
     end
 
+    ifprop(base, :mtu) do
+      add do |transport, value|
+        base.mtu = value
+      end
+    end
+
     ifprop(base, :port_channel) do
       add do |transport, value|
         base.port = value
@@ -203,26 +209,27 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
           transport.command('enable')
           transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
           transport.command("int #{interface}")
+          transport.command("mtu #{base.mtu}")
           transport.command('no shutdown')
           transport.command('end')
         end
         base.interfaceport = interfaceports
-        PuppetX::Dell_iom::Model::Ioa_mode::Base.configure_vlt_setting(transport, base.interfaceport, base.destination_ip, base.device_id, base.port)
+        PuppetX::Dell_iom::Model::Ioa_mode::Base.configure_vlt_setting(transport, base.interfaceport, base.destination_ip, base.device_id, base.port, base.mtu)
       end
     end
   end
 
-  def self.configure_vlt_setting(transport, interface_ports, destination_ip, device_id, port_channel)
+  def self.configure_vlt_setting(transport, interface_ports, destination_ip, device_id, port_channel, mtu)
     vltdomain = {}
     vltdomain['port_channel'] = port_channel
     vltdomain['ip_destination'] = destination_ip
     vltdomain['unit-id'] = device_id
     PuppetX::Dell_iom::Model::Ioa_mode::Base.remove_vlt_uplinks(transport)
-    PuppetX::Dell_iom::Model::Ioa_mode::Base.configureportchannel(transport, port_channel, interface_ports)
+    PuppetX::Dell_iom::Model::Ioa_mode::Base.configureportchannel(transport, port_channel, interface_ports, mtu)
     PuppetX::Dell_iom::Model::Ioa_mode::Base.configure_vltdomain(transport, vltdomain)
   end
 
-  def self.configureportchannel(transport, port_channel, interface_port)
+  def self.configureportchannel(transport, port_channel, interface_port, mtu)
     transport.command('enable')
     transport.command('configure terminal', :prompt => /\(conf\)#\z/n)
     interface_port.each do |interface|
@@ -238,6 +245,7 @@ module PuppetX::Dell_iom::Model::Ioa_mode::Base
       transport.command("channel-member #{port}")
     end
     transport.command('no shutdown')
+    transport.command("mtu #{mtu}")
     transport.command('end')
   end
 

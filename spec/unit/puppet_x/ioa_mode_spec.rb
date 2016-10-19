@@ -71,8 +71,9 @@ describe PuppetX::Dell_iom::Model::Ioa_mode do
     @transport.should_receive(:command).once.ordered.with('channel-member Tengigabitethernet 0/33')
     @transport.should_receive(:command).once.ordered.with('channel-member Tengigabitethernet 0/37')
     @transport.should_receive(:command).once.ordered.with('no shutdown')
+    @transport.should_receive(:command).once.ordered.with('mtu 9216')
     @transport.should_receive(:command).once.ordered.with('end')
-    PuppetX::Dell_iom::Model::Ioa_mode::Base.configureportchannel(@transport, port_channel, interface_port)
+    PuppetX::Dell_iom::Model::Ioa_mode::Base.configureportchannel(@transport, port_channel, interface_port, "9216")
   end
 
   it 'configure vlt domain ' do
@@ -128,9 +129,9 @@ describe PuppetX::Dell_iom::Model::Ioa_mode do
     destination_ip = "172.17.2.223"
     device_id = "0"
     model.should_receive(:remove_vlt_uplinks).with(@transport)
-    model.should_receive(:configureportchannel).with(@transport, port, interface_port)
+    model.should_receive(:configureportchannel).with(@transport, port, interface_port, "9216")
     model.should_receive(:configure_vltdomain).with(@transport, vltdomain)
-    PuppetX::Dell_iom::Model::Ioa_mode::Base.configure_vlt_setting(@transport, interface_port, destination_ip, device_id, port)
+    PuppetX::Dell_iom::Model::Ioa_mode::Base.configure_vlt_setting(@transport, interface_port, destination_ip, device_id, port, "9216")
   end
 
   it 'should list the existing port channels' do
