@@ -83,6 +83,16 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
       remove { |*_| }
     end
 
+    ifprop(base, :inclusive_vlans) do
+      match do |txt|
+        paramsarray = txt.match(/^T\s+(\S+)/)
+        paramsarray.nil? ? :absent : paramsarray[1]
+      end
+
+      add {|*_|}
+      remove { |*_| }
+    end
+
     ifprop(base, :vlan_tagged) do
       match do |txt|
         paramsarray = txt.match(/^T\s+(\S+)/)
@@ -100,8 +110,10 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
             transport.command("interface vlan #{value}")
             existing_config = transport.command("show config")
             existing_config.split("\n").each do  |line|
-              (transport.command("no #{line}")) if line =~ /tagged TenGigabitEthernet\s\d+..*/
-              (transport.command("no #{line}")) if line =~ /untagged TenGigabitEthernet\s\d+..*/
+              unless base.params[:inclusive_vlans].value == :true
+                (transport.command("no #{line}")) if line =~ /tagged TenGigabitEthernet\s\d+..*/
+                (transport.command("no #{line}")) if line =~ /untagged TenGigabitEthernet\s\d+..*/
+              end
             end
             transport.command("tagged #{scope_name}")
           end
@@ -113,7 +125,7 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
           vlans = tagged_vlan.split(",")
           # This array will just contain all the currently tagged vlans individually, instead of being in a range such as 1-5
           unranged_tagged_vlans = []
-          vlans.each_with_index do |vlan,index|
+          vlans.each do |vlan|
             if vlan.include?('-')
               vlan_range = vlan.split("-").flatten
               vlan_value = (vlan_range[0]..vlan_range[1]).to_a
@@ -125,35 +137,44 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
           requested_vlans = value.split(",").uniq.sort
           Puppet.debug "Requested_vlans: #{requested_vlans}"
 
-          # Find VLANs that need to be skipped
-          missing_vlans = []
-          vlans_toadd = []
-          (1..4094).each do |vlan_id|
-            missing_vlans.push(vlan_id) if !requested_vlans.include?(vlan_id.to_s)
-          end
-
-          missing_vlans = missing_vlans.to_ranges.join(",").gsub(/\.\./,'-')
-          Puppet.debug "Missing VLAN Range: #{missing_vlans}"
-
-          if unranged_tagged_vlans == requested_vlans
-            Puppet.debug "No change"
+          if base.params[:inclusive_vlans].value == :true && (requested_vlans - unranged_tagged_vlans).empty?
+            Puppet.debug("All requested vlans are already configured.")
           else
-            if unranged_tagged_vlans.empty?
-              vlans_toadd = value
-            else
-              requested_vlans.map { |x| vlans_toadd.push(x) if !unranged_tagged_vlans.include?(x) }
-              vlans_toadd = vlans_toadd.compact.flatten.uniq.to_ranges.join(",").gsub(/\.\./,'-')
+            # Find VLANs that need to be skipped
+            missing_vlans = []
+            vlans_toadd = []
+
+            (1..4094).each do |vlan_id|
+              missing_vlans.push(vlan_id) if !requested_vlans.include?(vlan_id.to_s)
             end
+
+            missing_vlans = missing_vlans.to_ranges.join(",").gsub(/\.\./,'-')
+            Puppet.debug "Missing VLAN Range: #{missing_vlans}"
+
+            if unranged_tagged_vlans == requested_vlans
+              Puppet.debug "No change"
+            else
+              if unranged_tagged_vlans.empty?
+                vlans_toadd = value
+              else
+                requested_vlans.map { |x| vlans_toadd.push(x) if !unranged_tagged_vlans.include?(x) }
+                vlans_toadd = vlans_toadd.compact.flatten.uniq.to_ranges.join(",").gsub(/\.\./,'-')
+              end
+            end
+
+            # Untag VLAN needs to be updated only if there is a overlap of untag VLAN with existing list of tag vlans
+            untag_vlan = ( existing_config.scan(/vlan untagged\s+(.*?)$/m).flatten.first || '' )
+
+            if base.params[:inclusive_vlans].value == :true && requested_vlans.include?(untag_vlan)
+              Puppet.debug("VLAN %s is already configured as untagged" % [untag_vlan])
+              raise("Existing untag VLAN configuration cannot be updated when inclusive vlan is true")
+            end
+
+            transport.command("no vlan untagged") if requested_vlans.include?(untag_vlan)
+
+            transport.command("no vlan tagged #{missing_vlans}") if !missing_vlans.nil? && base.params[:inclusive_vlans].value != :true
+            transport.command("vlan tagged #{vlans_toadd}") if !vlans_toadd.nil?
           end
-
-          # Untag VLAN needs to be updated only if there is a overlap of untag VLAN with existing list of tag vlans
-          untag_vlan = ( existing_config.scan(/vlan untagged\s+(.*?)$/m).flatten.first || '' )
-
-          transport.command("no vlan untagged") if requested_vlans.include?(untag_vlan)
-
-          transport.command("no vlan tagged #{missing_vlans}") if !missing_vlans.nil?
-          transport.command("vlan tagged #{vlans_toadd}") if !vlans_toadd.nil?
-
         end
       end
 
@@ -178,20 +199,25 @@ module PuppetX::Dell_iom::Model::Ioa_interface::Base
             existing_config = transport.command("show config")
 
             existing_config.split("\n").map{|line|
-              (transport.command("no #{line}")) if line =~ /untagged TenGigabitEthernet\s\d+..*/
+              (transport.command("no #{line}")) if line =~ /untagged TenGigabitEthernet\s\d+..*/ &&
+                  base.params[:inclusive_vlans].value != :true
             }
             transport.command("untagged #{scope_name}")
             transport.command("exit")
           }
           transport.command("interface #{scope_name}")
         else
+          if base.params[:inclusive_vlans].value == :true
+            raise("Existing untag VLAN configuration cannot be updated when inclusive vlan is true")
+          end
+
           transport.command("no vlan untagged")
           transport.command("no vlan tagged #{value}")
           transport.command("vlan untagged #{value}")
         end
       end
       remove do |transport, old_value|
-        transport.command("no vlan untagged")
+        transport.command("no vlan untagged") unless base.params[:inclusive_vlans].value == :true
       end
     end
 

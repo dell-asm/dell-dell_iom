@@ -87,5 +87,10 @@ Puppet::Type.newtype(:ioa_interface) do
     end
   end
 
+  newproperty(:inclusive_vlans) do
+    desc "Flag to indicate if existing vlans needs to be included"
+    newvalues(:true, :false)
+  end
+
 end
 

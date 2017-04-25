@@ -87,6 +87,14 @@ describe PuppetX::Dell_iom::Model::Ioa_interface do
         @transport.should_receive(:command).with("no vlan tagged 20")
         @interface.update(@old_params, @new_params)
       end
+
+      it 'should update untag vlan when inclusive vlan is set to false' do
+        @new_params[:vlan_untagged] = '20'
+        @new_params[:inclusive_vlans] = :false
+        @transport.should_receive(:command).with("no vlan tagged 20")
+        @transport.should_receive(:command).with("vlan untagged 20")
+        @interface.update(@old_params, @new_params)
+      end
     end
 
     describe 'when adding vlans & switch is in full-switch mode' do
@@ -110,11 +118,32 @@ describe PuppetX::Dell_iom::Model::Ioa_interface do
         @interface.update(@old_params, @new_params)
       end
 
+      it "should add a tagged vlan to an interface when iom is in full-switch and inclusive flag is true" do
+        @new_params[:vlan_tagged] = '15'
+        @new_params[:inclusive_vlans] = :true
+        @transport.should_receive(:command).with("interface vlan 15")
+        @transport.should_receive(:command).with("show config").and_return("tagged TenGigabitEthernet 0/4\n \ntagged Port-channel 15")
+        @transport.should_receive(:command).with("no tagged TenGigabitEthernet 0/4" ).never
+        @transport.should_receive(:command).with("tagged TenGigabitEthernet 0/3" )
+        @interface.update(@old_params, @new_params)
+      end
+
       it "should add untagged vlan to an interface when iom is in full switch" do
         @new_params[:vlan_untagged] = '18'
         @transport.should_receive(:command).with("interface vlan 18" )
         @transport.should_receive(:command).with("show config").and_return("untagged TenGigabitEthernet 0/4\n \ntagged Port-channel 15")
         @transport.should_receive(:command).with("no untagged TenGigabitEthernet 0/4" )
+        @transport.should_receive(:command).with("untagged TenGigabitEthernet 0/3" )
+        @transport.should_receive(:command).with("exit")
+        @transport.should_receive(:command).with("interface TenGigabitEthernet 0/3" )
+        @interface.update(@old_params, @new_params)
+      end
+
+      it "should not update untagged vlan when inclusive vlans flag is true" do
+        @new_params[:vlan_untagged] = '18'
+        @new_params[:inclusive_vlans] = :true
+        @transport.should_receive(:command).with("interface vlan 18" )
+        @transport.should_receive(:command).with("show config").and_return("untagged TenGigabitEthernet 0/4\n \ntagged Port-channel 15")
         @transport.should_receive(:command).with("untagged TenGigabitEthernet 0/3" )
         @transport.should_receive(:command).with("exit")
         @transport.should_receive(:command).with("interface TenGigabitEthernet 0/3" )
@@ -159,6 +188,64 @@ describe PuppetX::Dell_iom::Model::Ioa_interface do
       it 'should remove vlan as untagged if setting to tagged' do
         @new_params[:vlan_tagged] = '18'
         @transport.should_receive(:command).with("no vlan untagged")
+        @interface.update(@old_params, @new_params)
+      end
+
+      it "should not remove extra vlans when inclusive is true" do
+        @new_params[:vlan_tagged] = "20,23"
+        @new_params[:inclusive_vlans] = :true
+        @transport.should_receive(:command).with("no vlan tagged 28").never
+        @interface.update(@old_params, @new_params)
+      end
+
+      it "should remove extra vlans when inclusive is false" do
+        @new_params[:vlan_tagged] = "20,23"
+        @new_params[:inclusive_vlans] = :false
+        @transport.should_receive(:command).with("show config")
+        @transport.should_receive(:command).with("no vlan tagged 1-19,21-22,24-4094")
+        @interface.update(@old_params, @new_params)
+      end
+
+      it "should raise error when vlan is marked as untagged and it is required to be tagged with inclusive flag true" do
+        @new_params[:vlan_tagged] = "18"
+        @new_params[:inclusive_vlans] = :true
+        @transport.should_receive(:command).with("no vlan untagged").never
+        expect {@interface.update(@old_params, @new_params)}.to raise_error("Existing untag VLAN configuration cannot be updated when inclusive vlan is true")
+      end
+
+      it "should raise error when vlan is marked as untagged and it is required to be tagged with inclusive flag false" do
+        @new_params[:vlan_tagged] = "20"
+        @new_params[:inclusive_vlans] = :true
+        @transport.should_receive(:command).with("no vlan untagged").never
+        @interface.update(@old_params, @new_params)
+      end
+
+      it "should not raise error when vlan is marked as untagged and it is required to be tagged with inclusive flag false" do
+        @new_params[:vlan_tagged] = "18"
+        @new_params[:inclusive_vlans] = :false
+        @transport.should_receive(:command).with("no vlan untagged")
+        @interface.update(@old_params, @new_params)
+      end
+
+      it "should remove vlan as untagged if setting to tagged with inclusive flag false" do
+        @new_params[:vlan_tagged] = "18"
+        @new_params[:inclusive_vlans] = :false
+        @transport.should_receive(:command).with("no vlan untagged")
+        @interface.update(@old_params, @new_params)
+      end
+
+      it "should raise error when untag vlan configuration change is requested with inclusive flag true" do
+        @new_params[:vlan_untagged] = "30"
+        @new_params[:inclusive_vlans] = :true
+        @transport.should_receive(:command).with("no vlan untagged").never
+        expect {@interface.update(@old_params, @new_params)}.to raise_error("Existing untag VLAN configuration cannot be updated when inclusive vlan is true")
+      end
+
+      it "should not raise error when untag vlan configuration change is requested with inclusive flag false" do
+        @new_params[:vlan_untagged] = "30"
+        @new_params[:inclusive_vlans] = :false
+        @transport.should_receive(:command).with("no vlan untagged").ordered
+        @transport.should_receive(:command).with("vlan untagged 30").ordered
         @interface.update(@old_params, @new_params)
       end
     end
